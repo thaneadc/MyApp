@@ -1,4 +1,4 @@
-# Pirate Haven Web
+# Captain's Dash: The Final Isle Web
 
 Playable browser prototype for the pirate board game project.
 
@@ -16,4 +16,6 @@ Playable browser prototype for the pirate board game project.
 - Zone I → Zone II → Zone III → Final Island progression
 - First Captain to complete the Final Mission wins
 
-The live build is deployed separately on Vercel for browser playtesting.
+The settlement in the game is still called Pirate Haven. The game title is **Captain's Dash: The Final Isle**.
+
+The live build is deployed on Vercel for browser playtesting.
