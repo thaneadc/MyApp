@@ -1,21 +1,21 @@
-# Captain's Dash: The Final Isle Web
+# Captain's Dash: The Final Isle
 
-Playable browser prototype for the pirate board game project.
+Interactive browser board game prototype.
 
-## Version
-- Web Prototype v0.1
-- Rules basis: Prototype Rulebook v0.3
-- Local pass-and-play for 2–4 players
+## Current build: Web v0.3 — Step 1
 
-## Current gameplay
-- Place / Take Pirate action flow
-- Tavern, Market, Dock, Harbor Work, Crew Quarters
-- Unlockable Black Market, Veteran's Den, Sea Witch
-- Combat / Sailing / Search Crew stats
-- Custom die faces: 0,1,1,2,2,3
-- Zone I → Zone II → Zone III → Final Island progression
-- First Captain to complete the Final Mission wins
+Implemented:
+- Animated main menu
+- New Game / Continue
+- Local Pass & Play setup for 2–4 players
+- Player name editing and randomization
+- Browser save state for setup
+- How to Play panel
+- Motion and hint settings
+- Responsive iPad-friendly layout
 
-The settlement in the game is still called Pirate Haven. The game title is **Captain's Dash: The Final Isle**.
+## Next: Step 2 — Interactive Board
 
-The live build is deployed on Vercel for browser playtesting.
+The next build will add the real game table with pan/zoom, Pirate pawn drag-and-drop, legal-location highlighting, camera focus, and board HUD. Later steps add Crew/Treasure card interaction, Expeditions, dice animation, progression, and the Final Isle.
+
+Rules basis: Prototype Rulebook v0.3.
