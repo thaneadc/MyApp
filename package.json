@@ -1,0 +1,12 @@
+{
+  "name": "captains-dash",
+  "version": "0.8.0",
+  "private": true,
+  "scripts": {
+    "dev": "vite",
+    "build": "node scripts/build.mjs"
+  },
+  "devDependencies": {
+    "vite": "^7.1.0"
+  }
+}
