@@ -1,0 +1,49 @@
+name: Import Captain's Dash Full Build
+
+on:
+  push:
+    paths:
+      - '.github/workflows/import-full-build.yml'
+      - 'scripts/import_firestorage.py'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  import-full-build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Download and verify full-resolution v0.7.2
+        env:
+          SHARE_URL: https://firestorage.ai/ja/f/mlKnrh8BJaY-
+          FILE_ID: 01a074936b64733c88e9d12d303d8ed0
+          PUBLIC_ID: RornRyOVx9vDBbtC
+          EXPECTED_SHA: 9b12c78d58ce5f75bc3f71ab2c89d8569ceaed1d02f4698d2780394c3f68fb8d
+          MIN_SIZE: '4000000'
+          OUT: index.html
+        run: python3 scripts/import_firestorage.py
+
+      - name: Verify build markers
+        run: |
+          test $(wc -c < index.html) -gt 4000000
+          grep -q "Captain's Dash" index.html
+          echo "Full build size: $(wc -c < index.html) bytes"
+          sha256sum index.html
+
+      - name: Commit full-resolution game
+        run: |
+          git config user.name "captains-dash-build-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add index.html
+          if git diff --cached --quiet; then
+            echo "index.html already matches the full build"
+          else
+            git commit -m "Deploy Captain's Dash v0.7.2 full-resolution build"
+            git push origin HEAD:main
+          fi
