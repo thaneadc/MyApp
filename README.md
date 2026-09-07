@@ -1,55 +1,24 @@
-# Captain's Dash: The Final Isle
+# Captain’s Dash: The Final Isle — v0.8.1
 
-Full-resolution interactive browser board game prototype.
+Interactive local pass-and-play (2–4 players) and prototype solo AI game based on `RULES-v0.8.txt`.
 
-## Current build: v0.8.0
+## This release
+- New island board and 84 illustrated cards: 15 Crew, 20 Treasure, 41 normal Missions and 8 Final Missions. Rules are live text above the artwork.
+- Custom dice: SKULL / 0 / 0 / 1 / 2 / GOLD. Supply costs: 1 / 3 / 6 / 9.
+- Shared zone progression, optional Final approaches, one Dice Control per Expedition, rewards, casualties, victory and shared defeat.
+- Paid Expeditions and pending rewards are saved. Continue restores their phase without charging or rolling again.
+- Large centered, scrollable menu dialogs with keyboard focus handling; custom New Game confirmation replaces the small native confirmation.
+- Board fits the available screen; zoom and scrolling are available.
 
-The game now uses separate scripts and original image assets. Run `npm run build` to produce the static `dist/` deployment. No artwork was resized in this update.
+## Prototype defaults
+The source leaves worker occupancy, Crew deck copy counts and some effect details open. This build uses one action per turn without occupancy blocking, four copies per Crew type, Elite qualifying as Veteran, a 2 Gold blessing price and Atlas high targets 4/6/10. Final checks use participating Crew and active Treasures; Crew exhausted during the approach contributes no Power. These defaults are exposed in the rules UI and engine DEFAULTS. Online multiplayer is not implemented.
 
-### Implemented
-- Main Menu / New Game / Continue / Settings
-- Local Pass & Play for 2–4 players
-- Solo vs AI prototype
-- Full interactive board with pan/zoom/touch controls
-- Place → Take Pirate worker-placement turn flow
-- Tavern Crew market, Crew slots, Exhaust / Ready
-- Treasure inventory and 3 Active Treasure slots
-- Crew drag/drop and card interaction
-- Custom dice `0,1,1,2,2,3`
-- 15 Crew types
-- 20 unique Treasures
-- 47 Missions: Zone I 18, Zone II 14, Zone III 9, Final Isle 6
-- Expedition resolution, rewards and failure penalties
-- Zone I → II → III → Final Isle progression
-- Autosave / Continue
-- Final Island victory sequence
+The new save key is separate from the previous engine; old saves are preserved but not migrated. Board art is natively 1448×1086; zoom does not increase its native resolution.
 
-### Mobile fix in v0.7.2
-Hidden overlays no longer intercept pointer/touch events on Safari. The tested mobile flow is:
+## Run and publish
+`npm install`, `npm run dev`, `npm test`, `npm run build`.
+Vercel publishes the static `dist/` directory using `vercel.json`.
+The alternate connector build uses `scripts/build-release.mjs <full commit SHA>` and `release-manifest.json` to retrieve and verify runtime files from that immutable GitHub commit.
 
-`Play Game → Game Setup → Start Voyage → Board → Tavern → Recruit Crew`
-
-### Rules source
-Prototype Rulebook v0.3. The game-data values are authoritative when older concept artwork contains outdated printed text.
-
-## Changes in v0.8
-- Location actions remain open until resolved; the next action is locked meanwhile.
-- New Game and Continue are separate flows.
-- Dice and optional abilities are selected by the player; expedition rolls, used abilities, and costs are saved.
-- Late-game expeditions resume at the saved stage without paying the entry cost again.
-- Resource counters refresh immediately after expedition costs and paid abilities.
-- Crew & Treasure is hidden while on the main menu.
-
-## Validation — 6 September 2026
-- `node tests/rules.mjs`: 94 mission success/failure scenarios passed across the 47-mission catalog, plus dice thresholds, ability limits, and 2/3/4-player progression.
-- Five seeded AI simulations reached a winner in rounds 13–17. These are engine simulations, not full browser playthroughs.
-- Browser: late-game fixture → Dock → Final Isle → three stages → manual Lucky Doubloon use → winner screen passed.
-- Browser: navigation away during stage 2 → Continue restored stage 2, all three dice showing 3, and 3 remaining Supplies (entry cost was not charged again).
-- Browser: Final Isle failure → penalty → Continue returned to Take a Pirate phase.
-- Static build passed; all 47 referenced artwork files exist. Generated test fixtures are excluded from deployment and Git.
-- Native iPad/Safari testing remains outstanding. Online multiplayer is not implemented; local pass-and-play and solo AI are available.
-
-## Publishing
-Source and full-resolution assets are published to `thaneadc/MyApp` with user approval.
-For a normal Git import, run `npm run build` and publish `dist/`.
-For connector uploads with a 4 MB limit, `scripts/build-release.mjs <commit-sha>` downloads the 52 runtime files from that immutable GitHub revision and verifies every SHA-256 hash against `release-manifest.json`. Vercel then serves all files locally; gameplay has no GitHub runtime dependency.
+## Validation
+116 engine checks, including success and failure for all 49 Missions, payment atomicity, save/resume, Dice Control and Fortune bonuses. Browser checks cover menu setup, starting a voyage, payment, roll, casualty and end turn. Native iPad/Safari testing remains outstanding.

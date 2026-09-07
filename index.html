@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#071419">
-<title>Captain's Dash: The Final Isle — Full v0.8</title>
+<title>Captain's Dash: The Final Isle — Rules v0.8.1</title>
 <style>
 :root {
   --gold:#e7bd58; --gold2:#ffdf83; --ink:#f7edd7; --muted:#cbbda2;
@@ -325,15 +325,13 @@ body{min-height:100dvh}
       <aside class="panel" id="rulesPanel" aria-label="How to play">
         <div class="panelHeader"><div><h2>📖 How to Play</h2><p>The core rules at a glance.</p></div><button class="close" data-close type="button">×</button></div>
         <div class="panelBody rules">
-          <div class="ruleFlow">
-            <div class="ruleStep"><b>1</b>Place a Pirate</div><div class="ruleStep"><b>2</b>Resolve Location</div>
-            <div class="ruleStep"><b>3</b>Take a Pirate</div><div class="ruleStep"><b>4</b>Resolve & end turn</div>
-          </div>
-          <h3>Build your Crew</h3><p>Recruit up to 4 Crew. Ready Crew contribute Combat, Sailing and Search. Exhausted Crew contribute no stats or abilities.</p>
-          <h3>Explore the Sea</h3><p>Zone I requires Sailing 1, Zone II Sailing 3, Zone III Sailing 5 and the Final Isle Sailing 6.</p>
-          <h3>Roll Mission Dice</h3><p>The custom die is <b>0, 1, 1, 2, 2, 3</b>. Power 1–2 rolls 1 die, Power 3–5 rolls 2 dice and Power 6+ rolls 3 dice.</p>
-          <h3>Win the Game</h3><p>Be the first Captain to complete every stage of the Final Isle Mission during one Expedition.</p>
-          <div class="panelActions"><button class="primary" type="button" id="guideNote">Guidebook v0.3 is the rules source of truth</button></div>
+<div class="ruleFlow"><div class="ruleStep"><b>1</b>Choose an action</div><div class="ruleStep"><b>2</b>Prepare your crew</div><div class="ruleStep"><b>3</b>Pay Supply & roll</div><div class="ruleStep"><b>4</b>Resolve & end turn</div></div>
+<h3>Build your Crew</h3><p>Recruit Crew with Power and special abilities. Select up to 4 ready Crew and 3 active Treasures for each Expedition. You may own more than 4 Crew.</p>
+<h3>Unlock the Sea Together</h3><p>2 successful Zone I Missions unlock Zone II. 3 successful Zone II Missions unlock Zone III. 1 successful Zone III Mission unlocks Final Isle for everyone.</p>
+<h3>Supply & Dice</h3><p>Zone I: 1 Supply / 1 die. Zone II: 3 / 2. Zone III: 6 / 3. Final: 9 / 3.</p><p>Faces: <b>SKULL / 0 / 0 / 1 / 2 / GOLD</b>. Any Skull fails immediately and cannot be changed. Gold faces award Gold even on failure. Use at most one Dice Control per roll.</p>
+<h3>Final Isle</h3><p>Step 1 is an optional Favored Approach for +1 Final Edge. Step 2 requires Target 16 and no Skull to win immediately. A failed Final is discarded forever. If all 5 fail, everyone loses.</p>
+<h3>Prototype defaults</h3><p>One main action per turn; Haven actions do not block other players. Veteran checks include Elite. Starting base: 3 Gold / 4 Supply / 2 Deckhands. P2 gets +1 Gold; P3 and P4 get +1 Gold / +1 Supply. Open decisions remain documented in the Rules notes.</p>
+<div class="panelActions"><button class="primary" type="button" id="guideNote">Master Specification v0.8</button></div>
         </div>
       </aside>
 
@@ -354,7 +352,7 @@ body{min-height:100dvh}
         <div class="panelHeader"><div><h2>☠ Credits</h2><p>The crew behind Captain's Dash.</p></div><button class="close" data-close type="button">×</button></div>
         <div class="panelBody rules">
           <h3>Game</h3><p><b>Captain's Dash: The Final Isle</b><br>Competitive pirate adventure for 2–4 players.</p>
-          <h3>Prototype</h3><p>Interactive Web Edition · v0.8 · Rulebook v0.3.</p>
+          <h3>Prototype</h3><p>Interactive Web Edition · v0.8 · Master Rules v0.8.</p>
           <h3>Art Direction</h3><p>Cinematic tropical pirate adventure, parchment-and-wood interface, readable board-game presentation.</p>
           <p style="margin-top:24px;font-style:italic">“More than a game. A journey.”</p>
         </div>
@@ -365,8 +363,8 @@ body{min-height:100dvh}
   <footer class="bottomBar">
     <div class="features">
       <span>👥 <b>2–4 Players</b> · Pass & Play</span>
-      <span>♟ <b>Worker Placement</b> · Place → Take → Act</span>
-      <span>🎲 <b>Custom Dice</b> · 0,1,1,2,2,3</span>
+      <span>♟ <b>Worker Placement</b> · Prepare → Sail → Resolve</span>
+      <span>🎲 <b>Custom Dice</b> · SKULL / 0 / 0 / 1 / 2 / GOLD</span>
       <span>🗺 <b>3 Zones</b> · Race to the Final Isle</span>
     </div>
     <div class="motto">More than a game. A journey.</div>
@@ -386,86 +384,8 @@ body{min-height:100dvh}
 </div>
 <script src="menu.js" defer></script>
 
-<div class="gameScreen" id="gameScreen" aria-label="Interactive game board"><div class="progressHud" id="progressHud"></div><div class="fullBadge">FULL GAME · v0.8</div><div class="aiThinking" id="aiThinking">☠ AI Captain is plotting a course…</div>
-  <header class="gameHud">
-    <div class="miniLogo">CAPTAIN'S DASH<span>THE FINAL ISLE · FULL BUILD</span></div>
-    <div class="phaseBox"><small id="turnMeta">Turn 1</small><strong id="phaseTitle">Place a Pirate</strong><em id="phaseSub">Choose an empty highlighted Haven location.</em></div>
-    <div class="hudBtns">
-      <button class="hudBtn" id="gameMenuBtn" title="Main Menu">☰</button>
-      <button class="hudBtn zoneFocus" data-focus="haven">Haven</button>
-      <button class="hudBtn zoneFocus" data-focus="z1">I</button>
-      <button class="hudBtn zoneFocus" data-focus="z2">II</button>
-      <button class="hudBtn zoneFocus" data-focus="z3">III</button>
-      <button class="hudBtn zoneFocus" data-focus="final">Final</button>
-    </div>
-  </header>
-  <div class="boardViewport" id="boardViewport" aria-label="Board. Drag to pan and pinch or wheel to zoom.">
-    <div class="boardWorld" id="boardWorld">
-      <img class="boardArt" draggable="false" alt="Captain's Dash game board" src="assets/7f6bbe30a4a88996.jpg">
-      <div class="seaGlint"></div><div class="fogBand fog1"></div><div class="fogBand fog2"></div><div class="boardShade"></div>
-      <button class="hotspot" data-location="tavern" style="left:18px;top:487px;width:137px;height:82px" aria-label="Tavern"><span class="spotLabel">Tavern</span></button>
-      <button class="hotspot" data-location="market" style="left:157px;top:487px;width:137px;height:82px" aria-label="Market"><span class="spotLabel">Market</span></button>
-      <button class="hotspot" data-location="dock" style="left:296px;top:487px;width:137px;height:82px" aria-label="Dock"><span class="spotLabel">Dock</span></button>
-      <button class="hotspot" data-location="work" style="left:18px;top:570px;width:137px;height:79px" aria-label="Harbor Work"><span class="spotLabel">Harbor Work</span></button>
-      <button class="hotspot" data-location="quarters" style="left:157px;top:570px;width:137px;height:79px" aria-label="Crew Quarters"><span class="spotLabel">Crew Quarters</span></button>
-      <button class="hotspot locked" data-location="black" style="left:18px;top:661px;width:204px;height:119px" aria-label="Black Market locked"><span class="spotLabel">Black Market · Locked</span></button>
-      <button class="hotspot locked" data-location="veteran" style="left:225px;top:661px;width:252px;height:119px" aria-label="Veteran's Den locked"><span class="spotLabel">Veteran's Den · Locked</span></button>
-      <button class="hotspot locked" data-location="witch" style="left:480px;top:661px;width:220px;height:119px" aria-label="Sea Witch locked"><span class="spotLabel">Sea Witch · Locked</span></button>
-      <div id="missionPins" class="missionPins"></div><div id="boardPawns"></div>
-    </div>
-  </div>
-  <div class="cameraRail">
-    <button class="camBtn" id="zoomIn" type="button">＋</button>
-    <button class="camBtn" id="zoomOut" type="button">−</button>
-    <button class="camBtn" id="fitBoard" type="button">Full</button>
-  </div>
-  <div class="zoomBadge" id="zoomBadge">100%</div>
-  <section class="actionPanel" id="actionPanel"><h3 id="actionTitle">Location</h3><p id="actionText"></p><div class="actionButtons" id="actionButtons"></div></section>
-  <footer class="playerRail">
-    <div class="playersStrip" id="playersStrip"></div>
-    <div class="handZone" id="handZone"><div class="handPawn" id="handPawn" aria-label="Current player's Pirate pawn" role="button" tabindex="0"></div><div class="handHint"><b id="handLabel">Drag Pirate to a highlighted location</b><small id="handSmall">Tap the pawn, then tap a location also works.</small></div></div>
-    <div class="resources"><div class="res"><b id="goldVal">3</b><small>Gold</small></div><div class="res"><b id="supplyVal">2</b><small>Supplies</small></div><div class="res"><b id="crewVal">1/4</b><small>Crew</small></div></div>
-  </footer>
-  <div class="gameToast" id="gameToast" role="status" aria-live="polite"></div>
-  <div class="turnCurtain" id="turnCurtain"><div class="turnCard"><small id="curtainSmall">PASS THE DEVICE</small><h2 id="curtainName">Captain</h2><p id="curtainText">Your turn is ready.</p><button id="curtainBtn" type="button">Begin Turn</button></div></div>
-</div>
-
-
-
-<!-- ===== Step 3 UI ===== -->
-<button id="playerBoardBtn" class="playerBoardBtn" type="button">⚓ Crew & Treasure<span>Open player board</span></button>
-<section id="crewOverlay" class="cardLayer" aria-label="Tavern crew market">
-  <div class="tavernStage">
-    <div class="tavernTop"><div><h2>🍺 The Tavern</h2><p id="tavernSubtitle">Recruit one face-up Crew by paying its Gold cost.</p></div><button id="crewOverlayClose" class="layerClose" type="button" aria-label="Close">×</button></div>
-    <div id="crewFan" class="crewFan"></div>
-    <div id="recruitDock" class="recruitDock"><div class="recruitDockCopy"><b>YOUR CREW BERTH</b><small>Drag a Tavern card into an empty Crew slot to recruit. If full, choose which Crew to dismiss.</small></div><div id="tavernCrewSlots" class="tavernCrewSlots"></div></div>
-    <div class="tavernFooter"><small id="marketHint">Tap a card to inspect it. You may recruit one Crew during this action.</small><button id="skipRecruit" type="button">Leave Tavern</button></div>
-  </div>
-</section>
-<section id="cardInspect" class="inspect" aria-label="Card details"><div id="inspectBox" class="inspectBox"></div></section>
-<section id="playerDrawer" class="playerDrawer" aria-label="Player crew and treasures">
-  <div class="drawerHead"><div><h3 id="drawerTitle">Captain's Crew</h3><small id="drawerSub"></small></div><button id="drawerClose" class="drawerClose" type="button">×</button></div>
-  <div class="drawerGrid">
-    <div class="drawerSection"><h4>Crew · 4 Slots</h4><div id="crewSlots" class="crewSlots"></div><div id="drawerActions" class="drawerActions"></div><div class="drawerHint">Exhausted Crew provide no stats or abilities until readied.</div></div>
-    <div class="drawerSection"><h4>Active Treasures · 3 Slots</h4><div id="activeTreasureSlots" class="activeTreasureSlots"></div><h4 style="margin-top:13px">Treasure Inventory</h4><div id="treasureInventory" class="inventory treasureDropZone"></div><div class="drawerActions"><button id="treasureCodexBtn" type="button">Treasure Reference</button></div></div>
-  </div>
-</section>
-<section id="treasureCodex" class="treasureCodex" aria-label="Treasure reference"><div class="codexHead"><div><h2>Treasure Reference</h2><small>Actual ownership is shown on your Player Board.</small></div><button id="codexClose" class="layerClose" type="button">×</button></div><div id="codexGrid" class="codexGrid"></div></section>
-<div id="cardDragGhost" class="cardDragGhost" aria-hidden="true"></div><div id="cardFx" class="cardFx" aria-hidden="true"></div>
-
-<section id="expeditionLayer" class="expeditionLayer" aria-label="Expedition mission selection">
-  <header class="expTop"><div><h2>⚓ Launch Expedition</h2><p id="expSubtitle">Choose a revealed island Mission.</p></div><button id="expClose" class="expClose" type="button">×</button></header>
-  <div><nav id="zoneTabs" class="zoneTabs"></nav><div id="missionGrid" class="missionGrid"></div></div>
-  <footer class="expFooter"><span id="expStats"></span><button id="expEquip" type="button">Choose Active Treasures (up to 3)</button></footer>
-</section>
-<section id="missionDetail" class="missionDetail"><div class="missionDetailBox"><div id="detailArt" class="detailArt"></div><div class="detailData"><small id="detailZone"></small><h2 id="detailName"></h2><div id="detailTests"></div><div id="detailSpecial" class="testRow"></div><div id="detailTreasure" class="missionTreasure"></div><div id="detailReason" class="testRow"></div><div class="detailActions"><button id="detailClose" class="detailClose" type="button">Back</button><button id="detailAttempt" class="attemptBtn" type="button">Attempt Mission</button></div></div></div></section>
-<section id="diceStage" class="diceStage"><div class="diceBox"><small id="diceMission"></small><h2 id="diceTitle">Test</h2><div id="diceSet" class="diceSet"></div><div class="diceResult"><div id="diceTotal" class="diceTotal"></div><div id="diceTarget"></div><div id="diceMods" class="modLog"></div><div id="rollActions" class="rollActions"></div></div><button id="diceContinue" class="diceContinue" type="button">Continue</button></div></section>
-<section id="cinematic" class="cinematic"><div class="cineBox"><div id="cineIcon" class="cineIcon">🧭</div><h2 id="cineTitle"></h2><p id="cineText"></p><button id="cineContinue" type="button">Continue</button></div></section>
-<section id="victoryLayer" class="victoryLayer"><div class="victoryBox"><div class="crown">👑</div><small>THE FINAL ISLE HAS FALLEN</small><h1 id="winnerName">Captain Wins!</h1><p id="winnerText"></p><button id="victoryMenu" type="button">Return to Main Menu</button></div></section>
-<section id="choiceLayer" class="choiceLayer" role="dialog" aria-modal="true" aria-labelledby="choiceTitle"><div class="choiceBox"><h2 id="choiceTitle"></h2><div id="choiceOptions"></div></div></section>
-<script src="game.js" defer></script>
-
-
-<script src="touch.js" defer></script>
-</body>
-</html>
+<main id="voyage" hidden></main>
+<dialog id="voyageDialog"><header><h2 id="voyageTitle"></h2><button id="voyageClose" aria-label="Close window">×</button></header><div id="voyageBody"></div></dialog>
+<link rel="stylesheet" href="voyage-v08.css">
+<script type="module" src="voyage-v08.js"></script>
+</body></html>

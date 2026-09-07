@@ -1,0 +1,1720 @@
+CAPTAIN'S DASH: THE FINAL ISLE
+MASTER INTERACTIVE GAME SPECIFICATION
+Prototype v0.8
+Prepared for Interactive Web Game Implementation
+
+STATUS LEGEND
+[LOCKED]       = agreed rule / current source of truth
+[PROVISIONAL]  = implementation default used for simulation; may change after playtest
+[OPEN]         = not yet fully defined
+
+======================================================================
+0. GAME OVERVIEW
+======================================================================
+
+[LOCKED]
+
+Title:
+Captain's Dash: The Final Isle
+
+Players:
+2–4
+
+Genre:
+Competitive pirate adventure / worker placement / mission selection /
+push-your-luck / resource progression
+
+Core objective:
+- Build a capable pirate crew
+- Gain Gold, Supply, Treasure, Crew and Veteran Crew
+- Progress through Zone I, Zone II and Zone III
+- Use Zone III to prepare for the Final Isle
+- Complete a Final Mission to win immediately
+
+Shared-loss condition:
+- Each game uses 5 Final Mission cards drawn from a pool of 8
+- A failed Final Mission is permanently discarded
+- If all 5 Final Missions are discarded and nobody has succeeded:
+  ALL PLAYERS LOSE
+
+Design intent:
+- Mission completion should be the primary engine for progression
+- Pirate Haven should be used for preparation, recruitment and recovery
+- Players should not need to repeatedly farm Gold/Supply for many turns
+- Final Isle should normally require a strong team containing multiple
+  Veteran Crew and Treasure cards
+- Final Mission should remain risky even for a well-prepared player
+
+
+======================================================================
+1. BOARD / NAVIGATION MODEL
+======================================================================
+
+[LOCKED]
+
+There is no island-number sequence.
+There are no route lines between islands.
+There is no forced movement path.
+
+When a Zone is unlocked:
+- A player may choose any currently face-up Mission in that Zone
+- Player Pirate Token moves from Pirate Haven to the chosen Mission
+- Resolve the Expedition
+- Token returns to Pirate Haven after resolution
+
+All players use the same pirate portrait token design.
+Different players are identified by player color / colored outer ring.
+
+No Treasure slot exists on individual islands.
+Treasure is drawn from one central Treasure Deck.
+
+Board zones:
+
+ZONE I
+- 3 Mission Stack slots
+- 2 Mission cards per stack
+- 3 face-up choices at a time
+
+ZONE II
+- 3 Mission Stack slots
+- 2 Mission cards per stack
+- 3 face-up choices at a time
+
+ZONE III
+- 2 Mission Stack slots
+- 2 Mission cards per stack
+- 2 face-up choices at a time
+
+FINAL ISLE
+- 1 Final Mission Stack
+- 5 Final Mission cards per game
+- Drawn randomly from 8 available Final Missions
+- Only the top Final Mission is active
+
+SHARED AREAS
+- Mission Discard
+- Crew Deck / Crew Market
+- Veteran / Elite recruitment area
+- Treasure Deck
+- Treasure Discard
+- Gold supply
+- Supply tokens
+- Pirate Haven worker locations
+- Player Pirate Tokens
+
+
+======================================================================
+2. MISSION STACK SETUP
+======================================================================
+
+[LOCKED]
+
+ZONE I
+1. Shuffle all 18 Zone I Mission cards.
+2. Randomly draw 6.
+3. Create 3 stacks of 2 cards.
+4. Top card of each stack is face up.
+5. Bottom card is face down.
+
+ZONE II
+1. Shuffle all 14 Zone II Mission cards.
+2. Randomly draw 6.
+3. Create 3 stacks of 2 cards.
+4. Top card of each stack is face up.
+5. Bottom card is face down.
+
+ZONE III
+1. Shuffle all 9 Zone III Mission cards.
+2. Randomly draw 4.
+3. Create 2 stacks of 2 cards.
+4. Top card of each stack is face up.
+5. Bottom card is face down.
+
+FINAL ISLE
+1. Shuffle all 8 Final Mission cards.
+2. Randomly draw 5.
+3. Stack all 5 in one pile.
+4. Reveal only the top card.
+5. Remaining 3 Final cards are not used this game.
+
+When a normal Zone I–III Mission succeeds:
+1. Apply the full Mission Reward.
+2. Move that Mission to MISSION DISCARD.
+3. If another card remains underneath that stack, reveal it.
+4. If the stack is empty, reveal the board artwork:
+   "MISSION COMPLETE"
+5. Do not refill that stack from the unused Mission deck.
+
+When a normal Zone I–III Mission fails:
+- Mission stays in place
+- Supply remains spent
+- Lose 1 participating Crew unless prevented
+- Mission can be attempted again later
+
+
+======================================================================
+3. GLOBAL ZONE PROGRESSION
+======================================================================
+
+[LOCKED – CURRENT WORKING RULE]
+
+Zone II unlock:
+- After 2 total successful Zone I Missions globally
+
+Zone III unlock:
+- After 3 total successful Zone II Missions globally
+
+Final Isle unlock:
+- After 1 total successful Zone III Mission globally
+
+Progress is shared by all players.
+One player's success can unlock a Zone for everyone.
+
+Important:
+After Final Isle is unlocked, Zone III remains available.
+Players may continue completing Zone III Missions to gain Veteran,
+Treasure, Supply or other upgrades before attempting Final Isle.
+
+
+======================================================================
+4. RESOURCES
+======================================================================
+
+[LOCKED]
+
+GOLD
+Used for:
+- Recruiting Crew
+- Buying Supply
+- Some abilities
+- Some Final Mission Favored Approaches
+
+SUPPLY
+Used to pay Expedition cost before a Mission begins.
+
+Current Supply costs:
+- Zone I     = 1 Supply
+- Zone II    = 3 Supply
+- Zone III   = 6 Supply
+- Final Isle = 9 Supply
+
+Supply is paid before rolling.
+Normally, paid Supply is not returned on success or failure.
+Card abilities may reduce, refund or gain Supply.
+
+MARKET
+- 1 Gold = 1 Supply
+- Buy up to 5 Supply per Market action
+
+CREW
+- Maximum 4 participating Crew per Expedition
+- Provide Power and abilities
+- Normal Mission failure causes loss of 1 participating Crew unless prevented
+
+VETERAN / ELITE CREW
+- Higher-value Crew with stronger Power and/or abilities
+- Important for late-game builds and several Final Mission conditions
+
+TREASURE
+- Active Treasure limit: 3
+- Zone I and Zone II:
+  Treasure abilities function, but Treasure gives no automatic Power
+- Zone III and Final Isle:
+  each active Treasure gives +1 Power
+- Some Treasure may give additional Power or special effects
+
+
+======================================================================
+5. STARTING RESOURCES / PLAYER ORDER
+======================================================================
+
+[PROVISIONAL BASE – USED IN LATEST BALANCE SIMULATION]
+
+Base resources for every player:
+- Gold 3
+- Supply 4
+- Starting Common Crew 2
+
+This base was used in the latest simulation.
+It is not yet confirmed as final printed-rule starting setup.
+
+[LOCKED STARTING PLAYER BONUSES]
+
+Player 1:
+- Base only
+
+Player 2:
+- Base +1 Gold
+
+Player 3:
+- Base +1 Gold +1 Supply
+
+Player 4:
+- Base +1 Gold +1 Supply
+
+IMPORTANT CHANGE IN v0.8:
+Player 4 now receives exactly the same starting bonus as Player 3.
+The previous "+1 Supply +1 extra Crew" rule for Player 4 is removed.
+
+Therefore:
+
+2-player game
+P1 = 3 Gold, 4 Supply, 2 Common Crew
+P2 = 4 Gold, 4 Supply, 2 Common Crew
+
+3-player game
+P1 = 3 Gold, 4 Supply, 2 Common Crew
+P2 = 4 Gold, 4 Supply, 2 Common Crew
+P3 = 4 Gold, 5 Supply, 2 Common Crew
+
+4-player game
+P1 = 3 Gold, 4 Supply, 2 Common Crew
+P2 = 4 Gold, 4 Supply, 2 Common Crew
+P3 = 4 Gold, 5 Supply, 2 Common Crew
+P4 = 4 Gold, 5 Supply, 2 Common Crew
+
+
+======================================================================
+6. MISSION DIE
+======================================================================
+
+[LOCKED]
+
+Custom six-sided Mission Die faces:
+
+1. SKULL
+2. 0
+3. 0
+4. 1
+5. 2
+6. GOLD
+
+Result meanings:
+
+SKULL
+- Immediate Mission failure
+- Cannot be rerolled, cancelled or modified
+
+0
+- +0 Power
+
+1
+- +1 Power
+
+2
+- +2 Power
+
+GOLD
+- +0 Power
+- Gain 1 Gold
+- Gold is still gained even if another die shows Skull
+
+Dice by Zone:
+- Zone I     = 1 die
+- Zone II    = 2 dice
+- Zone III   = 3 dice
+- Final Isle = 3 dice in Final Mission Step 2
+
+Multiple dice:
+- If at least one Skull appears, Mission fails immediately
+
+DICE CONTROL
+- Maximum 1 Dice Control effect per roll
+- Skull cannot be affected by Dice Control
+
+
+======================================================================
+7. POWER / MISSION RESOLUTION
+======================================================================
+
+[LOCKED]
+
+Mission Total Power =
+
+Participating Crew Power
++ Veteran / Elite Crew Power
++ Treasure Power when applicable
++ Numeric Dice Power
++ Ability bonuses
++ Final Edge when applicable
+
+NORMAL MISSION SUCCESS
+Success if:
+1. No Skull is rolled
+2. Total Power >= Mission Target
+
+NORMAL MISSION FAILURE
+Failure if:
+- At least one Skull is rolled
+OR
+- Total Power < Target
+
+MISSION RESOLUTION ORDER
+
+1. Select an unlocked Zone
+2. Select one face-up Mission
+3. Select up to 4 participating Crew
+4. Select up to 3 active Treasure
+5. Apply pre-expedition effects / reductions
+6. Pay Supply cost
+7. Move Pirate Token to the Mission
+8. Roll the required Mission Dice
+9. Collect Gold-face rewards
+10. Check Skull
+11. Apply one permitted Dice Control effect if applicable
+12. Calculate total Power
+13. Resolve success or failure
+14. Apply reward / loss / refund / card effects
+15. Move Mission card if completed
+16. Return Pirate Token to Pirate Haven
+
+
+======================================================================
+8. PIRATE HAVEN ACTIONS
+======================================================================
+
+[LOCKED / CURRENT WORKING VALUES]
+
+TAVERN
+- Recruit 1 Crew
+
+MARKET
+- Buy up to 5 Supply
+- Cost: 1 Gold per Supply
+
+DOCK
+- Launch an Expedition
+
+HARBOR WORK
+- Gain 2 Gold
+
+CREW QUARTERS
+- Ready up to 2 exhausted Crew
+
+BLACK MARKET
+- Refresh Crew Market
+- Recruit 1 Crew for 1 Gold less
+
+VETERAN'S DEN
+- Recruit Veteran / Elite Crew
+
+SEA WITCH
+Current Blessing options:
+
+FAIR WINDS
+- Reduce next Expedition Supply cost by 1
+
+WAR SPIRIT
+- +1 Mission Power
+
+KEEN SIGHT
+- Inspect Mission information before selecting
+
+FORTUNE
+- Reroll 1 non-Skull die
+- Must use the new result
+
+[PROVISIONAL TURN STRUCTURE]
+For current interactive implementation / simulation:
+- Each player performs 1 main action on their turn
+- A round ends after every player has taken one turn
+- Worker-placement occupancy/blocking rules should follow the intended
+  Pirate Haven implementation, but exact blocking behavior is still OPEN
+
+
+======================================================================
+9. CREW CARD DATABASE — 15 TYPES
+======================================================================
+
+C01 DECKHAND
+Tier: Common
+Cost: 1 Gold
+Power: 1
+Ability:
+- None
+Role:
+- Cheap basic Power
+
+C02 GUNNER
+Tier: Common
+Cost: 3 Gold
+Power: 2
+Ability: Powder Bonus
+- If at least one Gold face is rolled, gain +1 additional Gold
+
+C03 SCOUT
+Tier: Common
+Cost: 2 Gold
+Power: 1
+Ability: Forage
+- If a Gold face is rolled, gain +1 Supply
+
+C04 RAIDER
+Tier: Common
+Cost: 3 Gold
+Power: 2
+Ability: Plunder
+- On Mission success, gain +1 Gold
+
+C05 SAILMASTER
+Tier: Common
+Cost: 2 Gold
+Power: 1
+Ability: Sea Legs
+- Counts as Power 2 in Zone II, Zone III and Final Isle
+
+C06 SMUGGLER
+Tier: Common
+Cost: 3 Gold
+Power: 2
+Ability: Hidden Stores
+- On Mission failure, return 1 Supply
+
+C07 NAVIGATOR
+Tier: Veteran
+Cost: 4 Gold
+Power: 2
+Ability: Course Correction
+Type: Dice Control
+- If no Skull is present, change one die showing 0 into 1
+
+C08 QUARTERMASTER
+Tier: Veteran
+Cost: 3 Gold
+Power: 0
+Ability: Prepared Crew
+- After Mission resolution, refund half the Supply paid, rounded down
+
+Current refund examples using v0.8 Supply costs:
+- Zone I cost 1  -> refund 0
+- Zone II cost 3 -> refund 1
+- Zone III cost 6 -> refund 3
+- Final cost 9 -> refund 4
+
+Important:
+This ability became weaker in Zone I after Supply cost was reduced.
+This should be monitored during playtest.
+
+C09 SHARPSHOOTER
+Tier: Veteran
+Cost: 4 Gold
+Power: 3
+Ability: Take Aim
+Type: Dice Control
+- If there is no Skull and the player is exactly 1 Power short:
+  exhaust Sharpshooter for +1 Power
+
+C10 TREASURE HUNTER
+Tier: Veteran
+Cost: 4 Gold
+Power: 2
+Ability: Treasure Sense
+- When gaining Treasure, draw 2 and keep 1
+- Return/discard the other card according to Treasure Deck rule
+
+C11 BERSERKER
+Tier: Veteran
+Cost: 5 Gold
+Power: 4
+Ability: Reckless
+- If the Mission fails and Crew must be lost,
+  Berserker must be lost first
+
+C12 SURGEON
+Tier: Veteran
+Cost: 4 Gold
+Power: 2
+Ability: Patch Them Up
+- On failure, exhaust Surgeon instead of losing 1 Crew
+
+C13 CARTOGRAPHER
+Tier: Elite
+Cost: 5 Gold
+Power: 3
+Ability: Chart the Unknown
+- Look at the face-down lower Mission card of a stack
+- Used for Mission planning
+
+C14 VETERAN PIRATE
+Tier: Elite
+Cost: 6 Gold
+Power: 4
+Ability: Old Salt
+- After Mission success, ready 1 exhausted Crew
+
+C15 MASTER GUNNER
+Tier: Elite
+Cost: 6 Gold
+Power: 4
+Ability: Broadside
+Type: Dice Control
+- One Gold face may also count as +1 Power
+- The player still gains the Gold from that face
+
+
+======================================================================
+10. TREASURE CARD DATABASE — 20 TYPES
+======================================================================
+
+T01 ANCIENT COMPASS
+- Before selecting a Mission, inspect the face-down lower card of 1 Mission stack
+
+T02 ADMIRAL'S SPYGLASS
+- In Final Isle, this Treasure provides +1 additional Power
+- Therefore it contributes +2 Power total in Final:
+  +1 normal Final Treasure Power +1 special bonus
+
+T03 STORMGLASS
+- If a Mission fails without a Skull, regain 1 Supply
+
+T04 WINDCALLER CONCH
+- After Mission success, next Crew recruitment costs 1 Gold less
+
+T05 SPANISH STEEL
+- If Crew must be lost because of failure, gain 2 Gold
+
+T06 ROYAL FLINTLOCK
+- If at least one die shows 2, gain +1 Gold
+
+T07 BLACK POWDER HORN
+- Before rolling, pay 1 extra Supply
+- Gain 2 Gold immediately
+
+T08 CRIMSON CAPTAIN'S SABRE
+- If Mission succeeds without using Dice Control, gain +2 Gold
+
+T09 GOLDEN SPYGLASS
+- Each Gold face provides +1 additional Gold
+
+T10 EXPLORER'S JOURNAL
+- Mission success: gain +1 Supply
+
+T11 TEMPLE KEY
+- Once per Expedition, before paying Supply,
+  switch to another available Mission in the same Zone
+
+T12 CARTOGRAPHER'S ATLAS
+- If a high-target Mission in that Zone succeeds, gain +2 Gold
+
+T13 LUCKY DOUBLOON
+Type: Dice Control
+- If no Skull is rolled, add +1 to total Dice Power
+
+T14 LOADED BONES
+Type: Dice Control
+- If no Skull is rolled, change one 0 result into 1
+
+T15 FATE'S COIN
+- If Mission fails without Skull, gain +2 Gold
+
+T16 BLACK CAT CHARM
+- If the roll contains Skull and at least one Gold face,
+  gain +1 additional Gold
+
+T17 SMUGGLER'S LEDGER
+- Mission success: gain +2 Gold
+
+T18 BOTTOMLESS RUM BARREL
+- Reduce Mission Supply cost by 1
+- Minimum cost = 1
+
+T19 CAPTAIN'S MEDALLION
+- Discard this Treasure to prevent losing 1 Crew on Mission failure
+
+T20 CURSED CROWN
+- Mission success: gain +3 Gold
+- Mission failure: lose 1 Gold
+
+
+======================================================================
+11. ZONE I MISSION CARDS — 18
+======================================================================
+
+ZONE RULES
+Supply Cost: 1
+Dice: 1
+Setup: random 6 cards -> 3 stacks x 2
+
+Z1-01 TAX COLLECTOR'S SLOOP
+Target: 4
+Reward:
+- Gold 6
+
+Z1-02 FORGOTTEN SHRINE
+Target: 3
+Reward:
+- Treasure 1
+- Supply 2
+
+Z1-03 HIDDEN LAGOON
+Target: 3
+Reward:
+- Supply 4
+
+Z1-04 STOLEN CARGO
+Target: 4
+Reward:
+- Gold 3
+- Supply 3
+
+Z1-05 MERCHANT IN DISTRESS
+Target: 3
+Reward:
+- Crew 1
+- Supply 2
+
+Z1-06 PRISON BREAK
+Target: 4
+Reward:
+- Crew 1
+- Gold 3
+
+Z1-07 FISHERMAN'S SECRET
+Target: 3
+Reward:
+- Supply 3
+- Gold 2
+
+Z1-08 CANNON ON THE CLIFF
+Target: 4
+Reward:
+- Gold 5
+- Supply 1
+
+Z1-09 TIDE CAVE
+Target: 4
+Reward:
+- Treasure 1
+- Gold 3
+
+Z1-10 SMUGGLER'S CAMP
+Target: 3
+Reward:
+- Supply 5
+
+Z1-11 WRECK OF SAINT MARA
+Target: 3
+Reward:
+- Treasure 1
+- Supply 2
+
+Z1-12 BROKEN REEF PASSAGE
+Target: 4
+Reward:
+- Gold 2
+- Supply 4
+
+Z1-13 RED JACK'S HIDEOUT
+Target: 4
+Reward:
+- Crew 1
+- Gold 4
+
+Z1-14 ABANDONED WATCHTOWER
+Target: 4
+Reward:
+- Treasure 1
+- Gold 4
+
+Z1-15 RUM RUNNER CHASE
+Target: 4
+Reward:
+- Gold 4
+- Supply 3
+
+Z1-16 MUTINEER'S COVE
+Target: 4
+Reward:
+- Crew 1
+- Supply 3
+
+Z1-17 MOONLIT GROTTO
+Target: 4
+Reward:
+- Treasure 1
+- Supply 3
+
+Z1-18 CORAL MAZE
+Target: 4
+Reward:
+- Gold 3
+- Treasure 1
+- Supply 1
+
+
+======================================================================
+12. ZONE II MISSION CARDS — 14
+======================================================================
+
+ZONE RULES
+Supply Cost: 3
+Dice: 2
+Setup: random 6 cards -> 3 stacks x 2
+
+Z2-01 GHOST SHIP BOARDING
+Target: 6
+Reward:
+- Gold 5
+- Treasure 1
+- Supply 3
+
+Z2-02 TEMPLE OF TIDES
+Target: 6
+Reward:
+- Supply 5
+- Treasure 1
+
+Z2-03 GOVERNOR'S VAULT
+Target: 6
+Reward:
+- Gold 10
+
+Z2-04 STORM CHASERS
+Target: 5
+Reward:
+- Supply 7
+- Gold 2
+
+Z2-05 CANNIBAL COAST
+Target: 6
+Reward:
+- Crew 1
+- Gold 4
+- Supply 3
+
+Z2-06 THE SMUGGLER KING
+Target: 6
+Reward:
+- Supply 5
+- Gold 5
+
+Z2-07 CURSED ANCHORAGE
+Target: 6
+Reward:
+- Treasure 1
+- Crew 1
+- Supply 3
+
+Z2-08 FORT CRIMSON
+Target: 6
+Reward:
+- Veteran 1
+- Supply 4
+- Gold 2
+
+Z2-09 DEVIL'S TEETH
+Target: 5
+Reward:
+- Supply 8
+
+Z2-10 SUNKEN GALLEON
+Target: 5
+Reward:
+- Treasure 1
+- Gold 4
+- Supply 2
+
+Z2-11 ROYAL CONVOY
+Target: 6
+Reward:
+- Gold 6
+- Supply 4
+
+Z2-12 WHISPERING RUINS
+Target: 6
+Reward:
+- Treasure 1
+- Supply 5
+
+Z2-13 BLACK CURRENT
+Target: 6
+Reward:
+- Crew 1
+- Supply 5
+
+Z2-14 PIRATE HUNTERS
+Target: 6
+Reward:
+- Veteran 1
+- Supply 4
+
+
+======================================================================
+13. ZONE III MISSION CARDS — 9
+======================================================================
+
+ZONE RULES
+Supply Cost: 6
+Dice: 3
+Setup: random 4 cards -> 2 stacks x 2
+
+ZONE III DESIGN PURPOSE
+- High-risk preparation zone
+- Remains attractive after Final Isle unlocks
+- Major source of Veteran / Treasure / Supply
+- Intended to produce Final-ready teams
+
+Z3-01 HUNT THE LEVIATHAN
+Target: 10
+Reward:
+- Supply 8
+- Gold 6
+- Treasure 1
+
+Z3-02 THE BLACK CITADEL
+Target: 9
+Reward:
+- Veteran 1
+- Supply 7
+- Gold 3
+
+Z3-03 TEMPLE OF THE DROWNED GOD
+Target: 9
+Reward:
+- Veteran 2
+- Supply 6
+
+Z3-04 EYE OF THE MAELSTROM
+Target: 10
+Reward:
+- Supply 10
+- Treasure 1
+
+Z3-05 ADMIRAL'S LAST FLEET
+Target: 10
+Reward:
+- Veteran 1
+- Gold 6
+- Supply 6
+
+Z3-06 THE ABYSSAL VAULT
+Target: 10
+Reward:
+- Supply 8
+- Gold 4
+- Draw Treasure 2, Keep 1
+
+Z3-07 SIREN'S PASSAGE
+Target: 10
+Reward:
+- Veteran 1
+- Treasure 1
+- Supply 7
+
+Z3-08 ISLE OF ASHES
+Target: 9
+Reward:
+- Supply 9
+- Crew 1
+- Gold 4
+
+Z3-09 THE PIRATE KING'S TRIAL
+Target: 10
+Reward:
+- Veteran 2
+- Treasure 1
+- Supply 7
+
+
+======================================================================
+14. FINAL ISLE SYSTEM
+======================================================================
+
+[LOCKED]
+
+Final Mission Pool:
+8 cards
+
+Game setup:
+Randomly select 5 of the 8 Final Missions.
+
+Final Supply Cost:
+9 Supply
+
+Every Final Mission:
+- 2 Steps
+- Step 1 = Favored Approach / build check
+- Step 2 = Target 16 + roll 3 Mission Dice
+
+FINAL EDGE
+- If the player satisfies that Mission's Favored Approach:
+  +1 Power in Step 2
+- Maximum Final Edge = +1
+- Final Edge does not stack
+- A player may attempt the Final Mission without satisfying Favored Approach
+
+FINAL SUCCESS
+- If no Skull and Total Power >=16:
+  player wins immediately
+
+FINAL FAILURE
+1. Supply 9 remains spent
+2. Lose 1 Crew unless prevented
+3. Move active Final Mission to Mission Discard
+4. Reveal next Final Mission
+5. Failed Final Mission can never be retried
+
+FINAL DECK EMPTY
+If the 5th Final Mission also fails:
+- ALL PLAYERS LOSE immediately
+
+
+======================================================================
+15. FINAL MISSION CARDS — 8
+======================================================================
+
+F1 THE LOST CITY OF ORO
+Theme:
+Treasure Build
+
+STEP 1 — UNLOCK THE GOLDEN GATE
+Favored Approach:
+- Have 3 Treasure
+
+If achieved:
+- Final Edge +1
+
+STEP 2 — CLAIM THE LOST CITY
+Target: 16
+Roll: 3 Dice
+Success:
+WIN THE GAME
+
+
+F2 SKULL FORTRESS
+Theme:
+Veteran / Military Crew
+
+STEP 1 — STORM THE FORTRESS
+Favored Approach:
+- Have at least 2 Veteran Crew
+
+Alternative:
+- Discard 1 Crew before rolling
+
+Either method:
+- Final Edge +1
+
+STEP 2 — DEFEAT THE WARLORD
+Target: 16
+Roll: 3 Dice
+Success:
+WIN THE GAME
+
+
+F3 EYE OF THE STORM
+Theme:
+Supply / Preparation
+
+STEP 1 — CROSS THE MAELSTROM
+Choose one:
+- Pay 3 additional Supply
+OR
+- Exhaust 1 Veteran
+
+If achieved:
+- Final Edge +1
+
+STEP 2 — REACH THE EYE
+Target: 16
+Roll: 3 Dice
+Success:
+WIN THE GAME
+
+
+F4 THE CURSED TEMPLE
+Theme:
+Gold / Treasure Sacrifice
+
+STEP 1 — PAY THE ANCIENT PRICE
+Choose one:
+- Pay 6 Gold
+OR
+- Discard 1 Treasure
+
+If achieved:
+- Final Edge +1
+
+STEP 2 — BREAK THE CURSE
+Target: 16
+Roll: 3 Dice
+Success:
+WIN THE GAME
+
+
+F5 THRONE OF THE PIRATE KING
+Theme:
+Balanced End-Game Build
+
+STEP 1 — PROVE YOUR LEGEND
+Must have all:
+- 4 Crew
+- At least 2 Veteran
+- At least 2 Treasure
+
+If achieved:
+- Final Edge +1
+
+STEP 2 — DEFEAT THE PIRATE KING
+Target: 16
+Roll: 3 Dice
+Success:
+WIN THE GAME
+
+
+F6 LEVIATHAN'S MAW
+Theme:
+Raw Crew Power
+
+STEP 1 — FACE THE BEAST
+Favored Approach:
+- Crew Power >=10
+- Do not include Treasure or Dice
+
+If achieved:
+- Final Edge +1
+
+STEP 2 — SLAY THE LEVIATHAN
+Target: 16
+Roll: 3 Dice
+Success:
+WIN THE GAME
+
+
+F7 QUEEN OF THE SIRENS
+Theme:
+Crew Variety
+
+STEP 1 — RESIST THE SIREN SONG
+Favored Approach:
+- At least 3 different Crew types
+- At least 1 Veteran
+
+If achieved:
+- Final Edge +1
+
+STEP 2 — BREAK THE SIREN CROWN
+Target: 16
+Roll: 3 Dice
+Success:
+WIN THE GAME
+
+
+F8 THE BLACK HORIZON
+Theme:
+Resource Management / Desperation
+
+STEP 1 — BEYOND THE EDGE
+
+Safe Approach:
+- Pay 3 Gold
+- Pay 2 additional Supply
+- Gain Final Edge +1
+
+Desperate Charge:
+- Pay nothing extra
+- No Final Edge
+- Continue to Step 2
+
+STEP 2 — SAIL BEYOND FEAR
+Target: 16
+Roll: 3 Dice
+Success:
+WIN THE GAME
+
+
+======================================================================
+16. FINAL BALANCE INTENT
+======================================================================
+
+[LOCKED DESIGN INTENT]
+
+Every Final Mission has:
+- Same Base Target = 16
+- Same Step 2 Dice count = 3
+- Different Step 1 preparation style
+
+Reason:
+Final difficulty should not depend on randomly drawing an easier Target.
+
+Build identities:
+
+Lost City of Oro
+-> Treasure
+
+Skull Fortress
+-> Veteran / Crew sacrifice
+
+Eye of the Storm
+-> Supply / Veteran
+
+Cursed Temple
+-> Gold / Treasure sacrifice
+
+Throne of the Pirate King
+-> Balanced late-game build
+
+Leviathan's Maw
+-> Raw Crew Power
+
+Queen of the Sirens
+-> Crew diversity + Veteran
+
+Black Horizon
+-> Resource management / gamble
+
+Intended late-game Final contender:
+- 4 Crew
+- approximately 2–3 Veteran
+- approximately 2–3 Treasure
+- enough Supply for Final cost
+- total pre-dice Power typically around 14–15
+
+Final Target 16 is intentionally high enough that:
+- weak early rushes have poor odds
+- Veteran and Treasure meaningfully improve win probability
+- prepared players still face significant Skull risk
+
+
+======================================================================
+17. BALANCE TEST REFERENCE
+======================================================================
+
+[REFERENCE ONLY – SIMULATION, NOT HUMAN PLAYTEST]
+
+Latest simulation changed only Supply costs from:
+2 / 5 / 8 / 12
+to:
+1 / 3 / 6 / 9
+
+Mission rewards remained v0.7.
+
+Observed qualitative result:
+- Market use dropped substantially
+- Mission rewards became the main economy engine
+- Veteran and Treasure remained important for winning Final
+- Zone III remained useful after Final unlock
+- P4 previously appeared advantaged when receiving an extra Crew
+- v0.8 removes that extra P4 Crew and gives P4 the same bonus as P3
+
+Previous simulated winning teams were approximately:
+- Crew 4
+- Veteran ~2.7
+- Treasure ~2.5–2.7
+- Pre-dice Final Power ~14.6
+
+These numbers are simulation indicators only.
+They should not be treated as verified human playtest statistics.
+
+
+======================================================================
+18. CARD / UI DISPLAY REQUIREMENTS
+======================================================================
+
+NORMAL MISSION CARD should show:
+
+MISSION NAME
+ZONE
+TARGET
+REWARD ICONS
+
+Example:
+
+THE BLACK CITADEL
+ZONE III
+
+TARGET 9
+
+REWARD
+[VETERAN] x1
+[SUPPLY] x7
+[GOLD] x3
+
+Do NOT repeat on every normal Mission card:
+- Zone Supply cost
+- standard failure penalty
+- standard Dice count
+- route requirement
+- combat/sailing/search requirement
+
+These are global rules / board references.
+
+
+FINAL MISSION CARD should show:
+
+FINAL MISSION NAME
+Theme / art
+
+STEP 1
+Favored Approach condition
+FINAL EDGE +1
+
+STEP 2
+TARGET 16
+ROLL 3 DICE
+
+SUCCESS
+WIN THE GAME
+
+FAIL
+DISCARD THIS FINAL MISSION
+LOSE 1 CREW
+REVEAL NEXT FINAL MISSION
+
+
+======================================================================
+19. INTERACTIVE GAME STATE MODEL
+======================================================================
+
+[RECOMMENDED IMPLEMENTATION STRUCTURE]
+
+GAME STATE
+
+game:
+- version: "0.8"
+- playerCount: 2 | 3 | 4
+- roundNumber
+- currentPlayerIndex
+- gameStatus:
+  setup | playing | won | shared_loss
+- winnerPlayerId: null or playerId
+
+zoneProgress:
+- zone1Successes
+- zone2Successes
+- zone3Successes
+- zone2Unlocked
+- zone3Unlocked
+- finalUnlocked
+
+players[]:
+- id
+- name
+- color
+- gold
+- supply
+- crew[]
+- treasures[]
+- exhaustedCrew[]
+- pirateTokenLocation
+- pendingBlessing
+- discounts / temporaryEffects
+
+missionBoard:
+- zone1Stacks[3]
+- zone2Stacks[3]
+- zone3Stacks[2]
+- finalStack[5]
+- missionDiscard[]
+
+Each normal Mission stack:
+- topCardId
+- bottomCardId
+- completed
+- faceUpIndex
+
+Final stack:
+- orderedCardIds[]
+- activeIndex
+- remainingCount
+
+crewMarket:
+- visibleCrew[]
+- drawPile[]
+- discardPile[]
+
+treasureDeck:
+- drawPile[]
+- discardPile[]
+
+temporaryResolutionState:
+- selectedMissionId
+- selectedCrewIds[]
+- selectedTreasureIds[]
+- supplyCost
+- rolledDice[]
+- goldFromDice
+- diceControlUsed
+- calculatedPower
+- finalEdge
+- resolutionResult
+
+
+======================================================================
+20. SUGGESTED CARD DATA MODEL
+======================================================================
+
+CREW
+
+{
+  id,
+  name,
+  tier,
+  cost,
+  power,
+  abilityName,
+  abilityType,
+  abilityText,
+  exhaustRequired,
+  diceControl
+}
+
+TREASURE
+
+{
+  id,
+  name,
+  abilityName,
+  abilityType,
+  abilityText,
+  diceControl,
+  disposable,
+  activePowerZone3,
+  activePowerFinal
+}
+
+NORMAL MISSION
+
+{
+  id,
+  name,
+  zone,
+  target,
+  supplyCostFromZone,
+  diceCountFromZone,
+  reward: {
+    gold,
+    supply,
+    crew,
+    veteran,
+    treasure,
+    drawTreasure,
+    keepTreasure
+  }
+}
+
+FINAL MISSION
+
+{
+  id,
+  name,
+  theme,
+  step1Title,
+  favoredApproach,
+  alternateApproach,
+  finalEdge: 1,
+  step2Title,
+  target: 16,
+  dice: 3
+}
+
+
+======================================================================
+21. INTERACTIVE RESOLUTION EVENTS
+======================================================================
+
+Recommended event sequence for animations / logs:
+
+NORMAL EXPEDITION
+
+MISSION_SELECTED
+-> CREW_SELECTED
+-> TREASURE_SELECTED
+-> SUPPLY_PAID
+-> TOKEN_MOVED_TO_MISSION
+-> DICE_ROLLED
+-> GOLD_FACES_COLLECTED
+-> SKULL_CHECK
+-> DICE_CONTROL_WINDOW
+-> POWER_CALCULATED
+-> MISSION_SUCCESS or MISSION_FAILURE
+
+If SUCCESS:
+-> REWARD_GRANTED
+-> MISSION_MOVED_TO_DISCARD
+-> NEXT_MISSION_REVEALED or STACK_COMPLETED
+-> ZONE_UNLOCK_CHECK
+
+If FAILURE:
+-> CREW_LOSS_WINDOW
+-> FAILURE_EFFECTS
+-> MISSION_REMAINS
+
+Finally:
+-> TOKEN_RETURNED_TO_PIRATE_HAVEN
+-> TURN_END
+
+
+FINAL EXPEDITION
+
+FINAL_MISSION_SELECTED
+-> SUPPLY_9_PAID
+-> CREW_SELECTED
+-> TREASURE_SELECTED
+-> STEP_1_CHECK
+-> FINAL_EDGE_SET
+-> STEP_2_DICE_ROLL
+-> GOLD_FACES_COLLECTED
+-> SKULL_CHECK
+-> DICE_CONTROL_WINDOW
+-> FINAL_POWER_CALCULATED
+
+If SUCCESS:
+-> GAME_WON
+
+If FAILURE:
+-> CREW_LOSS_WINDOW
+-> FINAL_CARD_DISCARDED
+-> FINAL_REMAINING_COUNT_DECREASED
+
+If remainingCount == 0:
+-> SHARED_GAME_LOSS
+
+Else:
+-> NEXT_FINAL_CARD_REVEALED
+-> TOKEN_RETURNED_TO_PIRATE_HAVEN
+
+
+======================================================================
+22. WEB UI INTERACTION REQUIREMENTS
+======================================================================
+
+Board target resolution:
+2732 x 2048
+
+Mission interaction:
+- Clicking a face-up Mission opens Mission detail
+- Face-down lower card cannot normally be opened
+- Cartographer / Ancient Compass may reveal preview temporarily
+- Selecting Mission highlights permitted Crew and Treasure
+- Confirm Expedition should show Supply cost before payment
+
+Mission Stack visuals:
+- Visible top card
+- Second card visually stacked underneath
+- When top card is removed, animate second card flipping face up
+- When stack becomes empty, show:
+  MISSION COMPLETE
+
+Mission Discard:
+- Clickable history pile
+- Can show completed Mission cards
+- Optional implementation:
+  show which player completed each Mission
+
+Final Isle:
+- Show Final Missions Remaining visually:
+  ● ● ● ● ●
+- On each Final failure remove one marker:
+  ● ● ● ● ○
+- Final stack reaches zero:
+  strong shared-loss presentation
+
+Player token:
+- Same pirate portrait for all players
+- Colored outer ring / glow according to player
+- Move between Pirate Haven and selected Mission
+
+Recommended animation style:
+- subtle card lift
+- card flip
+- dice roll
+- token movement
+- reward icons fly toward player resource panel
+- Mission success card slides to Discard
+- Final failure should feel visibly more dramatic than normal Mission failure
+
+
+======================================================================
+23. IMPORTANT RULE FLAGS FOR CODE
+======================================================================
+
+SKULL_IMMEDIATE_FAILURE = true
+SKULL_MODIFIABLE = false
+
+MAX_DICE_CONTROL_PER_ROLL = 1
+
+MAX_CREW_PER_EXPEDITION = 4
+MAX_ACTIVE_TREASURE = 3
+
+ZONE1_SUPPLY_COST = 1
+ZONE2_SUPPLY_COST = 3
+ZONE3_SUPPLY_COST = 6
+FINAL_SUPPLY_COST = 9
+
+ZONE1_DICE = 1
+ZONE2_DICE = 2
+ZONE3_DICE = 3
+FINAL_DICE = 3
+
+ZONE2_UNLOCK_AT_ZONE1_SUCCESS = 2
+ZONE3_UNLOCK_AT_ZONE2_SUCCESS = 3
+FINAL_UNLOCK_AT_ZONE3_SUCCESS = 1
+
+FINAL_POOL_SIZE = 8
+FINAL_CARDS_PER_GAME = 5
+FINAL_TARGET = 16
+FINAL_EDGE_MAX = 1
+
+NORMAL_MISSION_REFILL = false
+FINAL_RETRY_SAME_CARD = false
+
+FINAL_DECK_EMPTY_RESULT = "ALL_PLAYERS_LOSE"
+
+
+======================================================================
+24. CURRENT OPEN / PROVISIONAL ITEMS BEFORE FINAL PRODUCTION
+======================================================================
+
+1. BASE STARTING RESOURCES
+[PROVISIONAL]
+Current simulation/default:
+- 3 Gold
+- 4 Supply
+- 2 Common Crew
+
+This can be used for the first interactive playable build,
+but should still receive human playtest validation.
+
+2. EXACT WORKER-PLACEMENT BLOCKING
+[OPEN]
+Need to decide:
+- Can multiple players use the same Pirate Haven action in one round?
+- Does a worker remain until round cleanup?
+- Is there a place-worker / retrieve-worker rhythm?
+
+3. CREW DECK QUANTITIES
+[OPEN]
+15 Crew types are defined.
+Number of physical/digital copies of each type is not yet locked.
+
+4. VETERAN REWARD SOURCE
+[OPEN]
+Need final implementation decision:
+- Dedicated Veteran deck
+OR
+- draw/select from Veteran/Elite subset/market
+
+For first prototype implementation, recommended:
+Dedicated Veteran pool containing Veteran + Elite cards.
+
+5. TREASURE DECK RESHUFFLE
+[OPEN]
+Recommended prototype default:
+- If Treasure draw pile empties, shuffle Treasure discard into a new draw pile
+- Do not reshuffle permanently discarded Treasure if later such a distinction is added
+
+6. CREW MARKET SIZE
+[WORKING]
+Current board concept uses:
+- 5 face-up Crew slots
+- draw deck
+- discard pile
+
+7. TURN STRUCTURE
+[PROVISIONAL]
+Current simulation default:
+- 1 main action per player per round
+
+This is usable for prototype coding but should be playtested.
+
+8. QUARTERMASTER BALANCE
+[WATCH]
+Supply costs are now 1 / 3 / 6 / 9.
+Quartermaster refunds half rounded down:
+0 / 1 / 3 / 4.
+Its Zone I effect is therefore zero and may eventually need revision.
+
+9. FINAL EYE OF THE STORM / BLACK HORIZON EXTRA SUPPLY
+[WATCH]
+Because Final base cost dropped from 12 to 9:
+- Eye of the Storm additional +3 Supply remains meaningful
+- Black Horizon additional +2 Supply remains meaningful
+Monitor through human playtest.
+
+10. STARTING ORDER BALANCE
+[WATCH]
+v0.8:
+- P3 and P4 now receive identical bonus:
+  +1 Gold +1 Supply
+This removes the previous extra-Crew advantage for P4.
+
+
+======================================================================
+25. CURRENT SOURCE OF TRUTH SUMMARY
+======================================================================
+
+Version:
+v0.8
+
+Players:
+2–4
+
+Starting base [PROVISIONAL]:
+3 Gold / 4 Supply / 2 Common Crew
+
+Starting bonuses:
+P1 = none
+P2 = +1 Gold
+P3 = +1 Gold +1 Supply
+P4 = +1 Gold +1 Supply
+
+Supply:
+Zone I = 1
+Zone II = 3
+Zone III = 6
+Final = 9
+
+Mission board:
+Zone I = 3 stacks x2
+Zone II = 3 stacks x2
+Zone III = 2 stacks x2
+Final = 1 stack x5 chosen from 8
+
+Unlock:
+Z2 after 2 Z1 successes
+Z3 after 3 Z2 successes
+Final after 1 Z3 success
+
+Dice:
+Z1 = 1
+Z2 = 2
+Z3 = 3
+Final = 3
+
+Die:
+SKULL / 0 / 0 / 1 / 2 / GOLD
+
+Final:
+2 Steps
+Target 16
+Final Edge maximum +1
+Fail = discard Final card
+5 failed Final cards = all players lose
+Success = immediate individual win
+
+Crew:
+15 types
+
+Treasure:
+20 types
+
+Normal Missions:
+Zone I = 18
+Zone II = 14
+Zone III = 9
+
+Final Missions:
+8 total
+5 random cards used per game
+
+Primary balance philosophy:
+MISSION = MAIN PROGRESSION ENGINE
+PIRATE HAVEN = PREPARATION / RECOVERY
+ZONE III = FINAL PREPARATION
+VETERAN + TREASURE = KEY TO RELIABLE FINAL ATTEMPTS
+
+
+======================================================================
+END OF CAPTAIN'S DASH MASTER INTERACTIVE GAME SPECIFICATION v0.8
+======================================================================

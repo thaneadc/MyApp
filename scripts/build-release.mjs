@@ -6,7 +6,7 @@ if(!/^[a-f0-9]{40}$/.test(revision||''))throw new Error('A full immutable releas
 const manifest=JSON.parse(await readFile('release-manifest.json','utf8'));
 for(let i=0;i<manifest.length;i+=6){
  await Promise.all(manifest.slice(i,i+6).map(async item=>{
-  if(!/^(assets\/[\w.-]+|index\.html|game\.js|menu\.js|touch\.js|polish\.css)$/.test(item.path))throw new Error('Unexpected asset path');
+  if(!/^(assets\/[\w.-]+|index\.html|menu\.js|polish\.css|cards-v08\.js|engine-v08\.mjs|voyage-v08\.js|voyage-v08\.css|RULES-v0\.8\.txt)$/.test(item.path))throw new Error('Unexpected asset path');
   const response=await fetch(`https://raw.githubusercontent.com/thaneadc/MyApp/${revision}/${item.path}`,{signal:AbortSignal.timeout(60000)});
   if(!response.ok)throw new Error(`${item.path}: HTTP ${response.status}`);
   const bytes=Buffer.from(await response.arrayBuffer());

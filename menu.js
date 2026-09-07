@@ -49,12 +49,13 @@
     } catch(e) {}
   }
   function closePanels() {
+    document.body.classList.remove("menu-modal-open");
     panels.forEach(p=>p.classList.remove("show"));
     menuButtons.forEach(b=>b.classList.remove("active"));
   }
   function openPanel(name) {
     closePanels();
-    const p=document.getElementById(name+"Panel"); if(p) p.classList.add("show");
+    const p=document.getElementById(name+"Panel"); if(p) {p.classList.add("show");document.body.classList.add("menu-modal-open");p.setAttribute("role","dialog");p.setAttribute("aria-modal","true");p.querySelector("button")?.focus();}
     const b=document.querySelector(`[data-panel="${name}"]`); if(b) b.classList.add("active");
     clickSfx(360);
   }
@@ -84,7 +85,7 @@
 
   function currentSetup() {
     return {
-      version:"0.3.1-step1",
+      version:"rules-0.8.1",
       players:count,
       names:[...document.querySelectorAll("#names input")].map(x=>x.value.trim()||"Captain"),
       captains:captainNames.slice(0,count),
@@ -98,7 +99,7 @@
     refreshContinue();
   }
   function refreshContinue() {
-    const raw=localStorage.getItem("captainsDashBoardStep7")||localStorage.getItem("captainsDashSetup");
+    const raw=localStorage.getItem("captainsDashRules08")||localStorage.getItem("captainsDashSetup");
     document.getElementById("continueBtn").disabled=!raw;
     document.getElementById("continueText").textContent=raw?"Resume your saved voyage":"No saved voyage yet";
   }
@@ -107,7 +108,7 @@
 
   document.getElementById("continueBtn").addEventListener("click",()=>{
     try {
-      const full=JSON.parse(localStorage.getItem("captainsDashBoardStep7")||"null");
+      const full=JSON.parse(localStorage.getItem("captainsDashRules08")||"null");
       if(full&&full.players?.length){const sv={players:full.players.length,names:full.players.map(p=>p.name),captains:full.players.map(p=>p.captain),mode:full.mode||"local",updatedAt:Date.now()};setCount(sv.players,sv.names);gameMode=sv.mode;document.getElementById("voyageSummary").textContent=`${sv.players} Captains · Saved Full Game`;document.getElementById("roster").innerHTML=sv.names.map((n,i)=>`<span>${sv.captains[i]} — ${esc(n)}</span>`).join("");document.getElementById("transition").classList.add("show");window.dispatchEvent(new CustomEvent("captainsdash:startgame",{detail:{...sv,resume:true}}));return;}
       const st=JSON.parse(localStorage.getItem("captainsDashSetup")||"null");if(!st)return;setCount(Math.max(2,Math.min(4,st.players||2)),st.names);gameMode=st.mode||"local";openPanel("setup");toast("Saved voyage restored.");
     } catch(e){toast("Could not restore the saved game.")}
@@ -117,8 +118,9 @@
     document.querySelectorAll("#names input").forEach((x,i)=>x.value=shuffled[i]);
     clickSfx(620);
   });
-  document.getElementById("startBtn").addEventListener("click",()=>{
-    if(localStorage.getItem("captainsDashBoardStep7")&&!window.confirm("Start a new voyage? This replaces the saved game on this device."))return;
+  function confirmNewVoyage(){return new Promise(resolve=>{const d=document.createElement('dialog');d.className='menuConfirm';d.innerHTML='<h2>Start a new voyage?</h2><p>This replaces the saved v0.8 voyage on this device.</p><div class="buttons"><button data-answer="no">Keep saved voyage</button><button data-answer="yes">Start new voyage</button></div>';document.body.appendChild(d);d.addEventListener('click',e=>{const a=e.target.closest('[data-answer]');if(a){d.close();d.remove();resolve(a.dataset.answer==='yes')}});d.addEventListener('cancel',()=>{d.remove();resolve(false)});d.showModal()})}
+  document.getElementById("startBtn").addEventListener("click",async()=>{
+    if(localStorage.getItem("captainsDashRules08")&&!await confirmNewVoyage())return;
     saveSetup(); clickSfx(660,.08);
     const s=currentSetup();
     document.getElementById("voyageSummary").textContent=`${s.players} Captains · ${s.mode==="ai"?"Solo vs AI":"Local Pass & Play"} · Final Isle awaits`;
@@ -159,8 +161,10 @@
     try{if(!document.fullscreenElement) await document.documentElement.requestFullscreen(); else await document.exitFullscreen();}catch(e){toast("Fullscreen is not available in this browser.")}
   });
   document.getElementById("langBtn").addEventListener("click",()=>toast("Game language is English for this prototype."));
-  document.getElementById("guideNote").addEventListener("click",()=>toast("Guidebook v0.3 remains the rules source of truth."));
+  document.getElementById("guideNote").addEventListener("click",()=>toast("Master Specification v0.8 is the rules source of truth."));
 
+  document.addEventListener('keydown',e=>{if(e.key==='Escape')closePanels();if(e.key==='Tab'){const p=panels.find(p=>p.classList.contains('show'));if(!p)return;const els=[...p.querySelectorAll('button:not(:disabled),input,select:not(:disabled)')];const first=els[0],last=els.at(-1);if(e.shiftKey&&document.activeElement===first){e.preventDefault();last.focus()}else if(!e.shiftKey&&document.activeElement===last){e.preventDefault();first.focus()}}});
+  window.addEventListener('captainsdash:startgame',closePanels);
   // Scene parallax on pointer devices. No sensor permissions are requested.
   app.addEventListener("pointermove",e=>{
     if(settings.reduceMotion) return;
@@ -172,5 +176,5 @@
   document.addEventListener("pointerdown",()=>{if(musicEnabled) toggleAmbient(true)},{once:true,passive:true});
 
   // Open Setup by default only on very wide screens; mobile stays on clean Home.
-  if(window.matchMedia("(min-width:1100px)").matches) openPanel("setup");
+
 })();
