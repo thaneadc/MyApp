@@ -156,7 +156,6 @@
     try{if(!document.fullscreenElement) await document.documentElement.requestFullscreen(); else await document.exitFullscreen();}catch(e){toast("Fullscreen is not available in this browser.")}
   });
   document.getElementById("langBtn").addEventListener("click",()=>toast("Game language is English for this prototype."));
-  document.getElementById("guideNote").addEventListener("click",()=>toast("Master Specification v0.15 is the rules source of truth."));
 
   document.addEventListener('keydown',e=>{if(e.key==='Escape')closePanels();if(e.key==='Tab'){const p=panels.find(p=>p.classList.contains('show'));if(!p)return;const els=[...p.querySelectorAll('button:not(:disabled),input,select:not(:disabled)')];const first=els[0],last=els.at(-1);if(e.shiftKey&&document.activeElement===first){e.preventDefault();last.focus()}else if(!e.shiftKey&&document.activeElement===last){e.preventDefault();first.focus()}}});
   window.addEventListener('captainsdash:startgame',closePanels);

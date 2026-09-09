@@ -251,7 +251,7 @@ body{min-height:100dvh}
 @media(max-width:720px){.missionDetailBox{grid-template-columns:1fr}.detailArt{min-height:320px}.progressHud{max-width:75%}.customDie{width:68px;height:68px}.expTop h2{font-size:20px}}
 </style><meta name="description" content="Captain’s Dash: The Final Isle. A full-resolution pirate board game for 2–4 captains, with solo AI, interactive missions and saved voyages.">
 <link rel="stylesheet" href="polish.css">
-<link rel="stylesheet" href="voyage-v014.css">
+<link rel="stylesheet" href="voyage-v014.css"><link rel="stylesheet" href="voyage-feedback.css">
 </head>
 <body><div class="mobileRotateHint">↻ Landscape recommended for the board</div>
 <div class="app" id="app">
@@ -259,7 +259,7 @@ body{min-height:100dvh}
   <div class="birds"><i class="bird b1"></i><i class="bird b2"></i><i class="bird b3"></i></div>
 
   <header class="topbar">
-    <div class="version">CAPTAIN'S DASH · FULL GAME · v0.15 FINAL</div>
+    <div class="version">CAPTAIN'S DASH · FULL GAME · v0.15.1 FINAL</div>
     <div class="quick">
       <button id="musicBtn" type="button" aria-label="Toggle music" title="Music">♫</button>
       <button id="sfxBtn" type="button" aria-label="Toggle sound effects" title="Sound effects">🔊</button>
@@ -325,7 +325,7 @@ body{min-height:100dvh}
 
       <aside class="panel" id="rulesPanel" aria-label="How to play">
         <div class="panelHeader"><div><h2>📖 How to Play</h2><p>The core rules at a glance.</p></div><button class="close" data-close type="button">×</button></div>
-        <div class="panelBody rules"><h3>Game Guide · v0.15 Final</h3><p><strong>Shared Pirate Tokens:</strong> Tokens have no owner or player color. Start with one at Tavern and one at Dock. Place on an empty unlocked location and resolve its action, then take any Pirate from a different occupied location and resolve that action. Never take the Pirate just placed. This clarification replaces any “your Pirate” wording in the illustrated guide.</p><p>Place 1 Pirate → resolve → take a shared Pirate from another location → resolve.</p><p>Combat / Sailing / Search. Maximum 4 Crew and 3 Treasures.</p><p>Final Missions require two successful tests. The last Final card stays available for retries.</p><p>Final Missions require both tests to succeed; there is no Final Edge bonus.</p><div class="panelActions"><button type="button" data-guide-page="1">Guide Page 1</button><button type="button" data-guide-page="2">Guide Page 2</button><button type="button" data-guide-page="3">Guide Page 3</button><button type="button" data-guide-page="4">Guide Page 4</button></div><img src="assets/guide-1.jpeg" alt="Game Guide page 1" style="width:100%;height:auto"><a href="RULES-v0.15.txt" target="_blank">Master Specification v0.15 Final</a><button id="guideNote" type="button">About these rules</button></div>
+        <div class="panelBody rules"><div class="guideGallery"><figure><figcaption>Game Guide · Page 1</figcaption><img src="assets/guide-1.jpeg" alt="Game Guide page 1" loading="lazy"></figure><figure><figcaption>Game Guide · Page 2</figcaption><img src="assets/guide-2.jpeg" alt="Game Guide page 2" loading="lazy"></figure><figure><figcaption>Game Guide · Page 3</figcaption><img src="assets/guide-3.jpeg" alt="Game Guide page 3" loading="lazy"></figure><figure><figcaption>Game Guide · Page 4</figcaption><img src="assets/guide-4.jpeg" alt="Game Guide page 4" loading="lazy"></figure></div></div>
       </aside>
 
       <aside class="panel" id="settingsPanel" aria-label="Settings">

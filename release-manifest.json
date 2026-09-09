@@ -1,13 +1,5 @@
 [
   {
-    "path": "RULES-v0.14.txt",
-    "sha256": "1ff75350ca3a9d7d31f26e9360d00bff1215b75b64e7abed3b44b5de226f77bb"
-  },
-  {
-    "path": "RULES-v0.15.txt",
-    "sha256": "23eba13f3650b525da52cf68716ca97945bac67c9c421181e16ad150c45d9170"
-  },
-  {
     "path": "assets/014ea26d527fb00d.jpg",
     "sha256": "014ea26d527fb00d1f39c8ced465f580fdeba80cf11054eec8a83845a4d7e3a4"
   },
@@ -220,6 +212,10 @@
     "sha256": "2fffac53131d34947875b14258e270216b488dff31588e7e3037e80e384b779b"
   },
   {
+    "path": "assets/silver-pirate-hat.png",
+    "sha256": "93c77b387cb9c69214f45024628da150ad8429dacf767027df7018781c5163da"
+  },
+  {
     "path": "assets/v08-board.png",
     "sha256": "d27878a8c14648178f6b4be19a5c7762606d8c47e7cf86ae1e29b95ee2b670ab"
   },
@@ -257,23 +253,31 @@
   },
   {
     "path": "index.html",
-    "sha256": "c365b95c56d7d414d37c68f55b349841c93bc86535d439218ff86f853fd25f9b"
+    "sha256": "5a5a960609541b24b9e57c7b2f560e7910770fb34b0668894a34ae73a92d90c2"
   },
   {
     "path": "menu.js",
-    "sha256": "baf74507affa204b8774bcf45a7456353116ef334f47bb006fc7cdb9e7da2670"
+    "sha256": "aa4e3e62fc99bcb2c27660dc9fe12b9cd04f47b4f28c8fb2cbbd96ae8f008ef5"
   },
   {
     "path": "polish.css",
     "sha256": "849ecad8b4bba4cfa2a5e01142e12ac6ca7f5a4055ce2851736be738de0d780e"
   },
   {
+    "path": "voyage-feedback.css",
+    "sha256": "c4612a77b6606aaea493d91726c0a48b856568e084234b8fc36c78d206a6b686"
+  },
+  {
+    "path": "voyage-flair.js",
+    "sha256": "8f529e0625fa7adae8ddd23fadf29302b079e8dae6d1d13d95c5cb800ae394d1"
+  },
+  {
     "path": "voyage-v014.css",
-    "sha256": "f6642c49cc9f5c99a6c2e7e95a22384572a18f5dd5da1ed6d29ae6abfcd0931f"
+    "sha256": "5059736c3d8e41a5f42e59cdf2cc460299bcba6fa5c09fbf1055909d7107c863"
   },
   {
     "path": "voyage-v014.js",
-    "sha256": "ba5f3ae6a5995ad36f73b4354f258b233a9ae8da3333495394295ddc27074bd4"
+    "sha256": "182c82bdd5f9d621aae78fb61e0feab06c9c667ddf5a14fcee7329ea7c693c18"
   },
   {
     "path": "voyage-v08.css",
