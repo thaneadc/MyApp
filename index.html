@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#071419">
-<title>Captain's Dash: The Final Isle — Rules v0.8.1</title>
+<title>Captain's Dash: The Final Isle — v0.15 Final</title>
 <style>
 :root {
   --gold:#e7bd58; --gold2:#ffdf83; --ink:#f7edd7; --muted:#cbbda2;
@@ -251,6 +251,7 @@ body{min-height:100dvh}
 @media(max-width:720px){.missionDetailBox{grid-template-columns:1fr}.detailArt{min-height:320px}.progressHud{max-width:75%}.customDie{width:68px;height:68px}.expTop h2{font-size:20px}}
 </style><meta name="description" content="Captain’s Dash: The Final Isle. A full-resolution pirate board game for 2–4 captains, with solo AI, interactive missions and saved voyages.">
 <link rel="stylesheet" href="polish.css">
+<link rel="stylesheet" href="voyage-v014.css">
 </head>
 <body><div class="mobileRotateHint">↻ Landscape recommended for the board</div>
 <div class="app" id="app">
@@ -258,9 +259,9 @@ body{min-height:100dvh}
   <div class="birds"><i class="bird b1"></i><i class="bird b2"></i><i class="bird b3"></i></div>
 
   <header class="topbar">
-    <div class="version">CAPTAIN'S DASH · FULL GAME · v0.8</div>
+    <div class="version">CAPTAIN'S DASH · FULL GAME · v0.15 FINAL</div>
     <div class="quick">
-      <button id="musicBtn" type="button" aria-label="Toggle ambient sound" title="Ambient sound">♫</button>
+      <button id="musicBtn" type="button" aria-label="Toggle music" title="Music">♫</button>
       <button id="sfxBtn" type="button" aria-label="Toggle sound effects" title="Sound effects">🔊</button>
       <button id="fullBtn" type="button" aria-label="Fullscreen" title="Fullscreen">⛶</button>
       <button id="langBtn" type="button" title="Language">◉ English</button>
@@ -277,7 +278,7 @@ body{min-height:100dvh}
       <nav class="menu">
         <button class="menuBtn active" type="button" data-icon="🧭" data-panel="setup"><strong>Play Game</strong><small>Set sail on a new adventure</small></button>
         <button class="menuBtn" type="button" data-icon="🧰" id="continueBtn"><strong>Continue</strong><small id="continueText">No saved voyage yet</small></button>
-        <button class="menuBtn" type="button" data-icon="📖" data-panel="rules"><strong>How to Play</strong><small>Learn the core flow</small></button>
+        <button class="menuBtn" type="button" data-icon="📖" data-panel="rules"><strong>Help / Game Guide</strong><small>Learn the core flow</small></button>
         <button class="menuBtn" type="button" data-icon="⚙" data-panel="settings"><strong>Settings</strong><small>Audio, display, accessibility</small></button>
         <button class="menuBtn" type="button" data-icon="☠" data-panel="credits"><strong>Credits</strong><small>Meet the crew behind the voyage</small></button>
       </nav>
@@ -324,21 +325,13 @@ body{min-height:100dvh}
 
       <aside class="panel" id="rulesPanel" aria-label="How to play">
         <div class="panelHeader"><div><h2>📖 How to Play</h2><p>The core rules at a glance.</p></div><button class="close" data-close type="button">×</button></div>
-        <div class="panelBody rules">
-<div class="ruleFlow"><div class="ruleStep"><b>1</b>Choose an action</div><div class="ruleStep"><b>2</b>Prepare your crew</div><div class="ruleStep"><b>3</b>Pay Supply & roll</div><div class="ruleStep"><b>4</b>Resolve & end turn</div></div>
-<h3>Build your Crew</h3><p>Recruit Crew with Power and special abilities. Select up to 4 ready Crew and 3 active Treasures for each Expedition. You may own more than 4 Crew.</p>
-<h3>Unlock the Sea Together</h3><p>2 successful Zone I Missions unlock Zone II. 3 successful Zone II Missions unlock Zone III. 1 successful Zone III Mission unlocks Final Isle for everyone.</p>
-<h3>Supply & Dice</h3><p>Zone I: 1 Supply / 1 die. Zone II: 3 / 2. Zone III: 6 / 3. Final: 9 / 3.</p><p>Faces: <b>SKULL / 0 / 0 / 1 / 2 / GOLD</b>. Any Skull fails immediately and cannot be changed. Gold faces award Gold even on failure. Use at most one Dice Control per roll.</p>
-<h3>Final Isle</h3><p>Step 1 is an optional Favored Approach for +1 Final Edge. Step 2 requires Target 16 and no Skull to win immediately. A failed Final is discarded forever. If all 5 fail, everyone loses.</p>
-<h3>Prototype defaults</h3><p>One main action per turn; Haven actions do not block other players. Veteran checks include Elite. Starting base: 3 Gold / 4 Supply / 2 Deckhands. P2 gets +1 Gold; P3 and P4 get +1 Gold / +1 Supply. Open decisions remain documented in the Rules notes.</p>
-<div class="panelActions"><button class="primary" type="button" id="guideNote">Master Specification v0.8</button></div>
-        </div>
+        <div class="panelBody rules"><h3>Game Guide · v0.15 Final</h3><p><strong>Shared Pirate Tokens:</strong> Tokens have no owner or player color. Start with one at Tavern and one at Dock. Place on an empty unlocked location and resolve its action, then take any Pirate from a different occupied location and resolve that action. Never take the Pirate just placed. This clarification replaces any “your Pirate” wording in the illustrated guide.</p><p>Place 1 Pirate → resolve → take a shared Pirate from another location → resolve.</p><p>Combat / Sailing / Search. Maximum 4 Crew and 3 Treasures.</p><p>Final Missions require two successful tests. The last Final card stays available for retries.</p><p>Final Missions require both tests to succeed; there is no Final Edge bonus.</p><div class="panelActions"><button type="button" data-guide-page="1">Guide Page 1</button><button type="button" data-guide-page="2">Guide Page 2</button><button type="button" data-guide-page="3">Guide Page 3</button><button type="button" data-guide-page="4">Guide Page 4</button></div><img src="assets/guide-1.jpeg" alt="Game Guide page 1" style="width:100%;height:auto"><a href="RULES-v0.15.txt" target="_blank">Master Specification v0.15 Final</a><button id="guideNote" type="button">About these rules</button></div>
       </aside>
 
       <aside class="panel" id="settingsPanel" aria-label="Settings">
         <div class="panelHeader"><div><h2>⚙ Settings</h2><p>Customize the voyage.</p></div><button class="close" data-close type="button">×</button></div>
         <div class="panelBody">
-          <div class="setting"><label for="musicRange">Ambient sound</label><input id="musicRange" type="range" min="0" max="100" value="35"></div>
+          <div class="setting"><label for="musicRange">Music</label><input id="musicRange" type="range" min="0" max="100" value="35"></div>
           <div class="setting"><label for="sfxRange">Sound effects</label><input id="sfxRange" type="range" min="0" max="100" value="60"></div>
           <div class="setting"><label>Show hints</label><button class="switch on" id="hintsSwitch" type="button" aria-pressed="true"></button></div>
           <div class="setting"><label>Reduce motion</label><button class="switch" id="motionSwitch" type="button" aria-pressed="false"></button></div>
@@ -352,7 +345,7 @@ body{min-height:100dvh}
         <div class="panelHeader"><div><h2>☠ Credits</h2><p>The crew behind Captain's Dash.</p></div><button class="close" data-close type="button">×</button></div>
         <div class="panelBody rules">
           <h3>Game</h3><p><b>Captain's Dash: The Final Isle</b><br>Competitive pirate adventure for 2–4 players.</p>
-          <h3>Prototype</h3><p>Interactive Web Edition · v0.8 · Master Rules v0.8.</p>
+          <h3>Game Design</h3><p>Designed by Thanead Chiawchanlikit</p><p>Interactive Web Edition · v0.15 Final.</p>
           <h3>Art Direction</h3><p>Cinematic tropical pirate adventure, parchment-and-wood interface, readable board-game presentation.</p>
           <p style="margin-top:24px;font-style:italic">“More than a game. A journey.”</p>
         </div>
@@ -387,5 +380,6 @@ body{min-height:100dvh}
 <main id="voyage" hidden></main>
 <dialog id="voyageDialog"><header><h2 id="voyageTitle"></h2><button id="voyageClose" aria-label="Close window">×</button></header><div id="voyageBody"></div></dialog>
 <link rel="stylesheet" href="voyage-v08.css">
-<script type="module" src="voyage-v08.js"></script>
+<link rel="stylesheet" href="voyage-v014.css">
+<script type="module" src="voyage-v014.js"></script>
 </body></html>

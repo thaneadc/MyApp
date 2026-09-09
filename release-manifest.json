@@ -1,7 +1,11 @@
 [
   {
-    "path": "RULES-v0.8.txt",
-    "sha256": "9b38bb356b2df88d65e227f8330d32a0d1a380d3a5308650a653a967b537913d"
+    "path": "RULES-v0.14.txt",
+    "sha256": "1ff75350ca3a9d7d31f26e9360d00bff1215b75b64e7abed3b44b5de226f77bb"
+  },
+  {
+    "path": "RULES-v0.15.txt",
+    "sha256": "23eba13f3650b525da52cf68716ca97945bac67c9c421181e16ad150c45d9170"
   },
   {
     "path": "assets/014ea26d527fb00d.jpg",
@@ -192,6 +196,30 @@
     "sha256": "fcbd6c3dddb82c127c4cb9606e736bd2338b1f0fc4d69256376701c067c62d73"
   },
   {
+    "path": "assets/guide-1.jpeg",
+    "sha256": "bc4db8fc4dc489363b8e011ee9ec5bd6af025fe1ec7d96a0b38ade7eeae5d9cb"
+  },
+  {
+    "path": "assets/guide-2.jpeg",
+    "sha256": "b28326d7ef250ee0922caae406fb4125f55668d8911db8bb83ebce44b7ebcbcd"
+  },
+  {
+    "path": "assets/guide-3.jpeg",
+    "sha256": "6c25392b531a809c5cc0337bcaae692d86fd7a4e32760a98076c011f50c0cc6f"
+  },
+  {
+    "path": "assets/guide-4.jpeg",
+    "sha256": "c37bc559678014a8eb8b200ebb3d214601925791f19f88e1d6b22933f0eade40"
+  },
+  {
+    "path": "assets/pirate-theme.mp3",
+    "sha256": "1d6a9d0345d8b0627491db2c0e86596eec87fdaba0201cdfc554b9881ef1e973"
+  },
+  {
+    "path": "assets/pirate-theme.ogg",
+    "sha256": "2fffac53131d34947875b14258e270216b488dff31588e7e3037e80e384b779b"
+  },
+  {
     "path": "assets/v08-board.png",
     "sha256": "d27878a8c14648178f6b4be19a5c7762606d8c47e7cf86ae1e29b95ee2b670ab"
   },
@@ -220,31 +248,35 @@
     "sha256": "59362bfd05284f9e3c82272d884ff6ef7de507dda51e5d3e2e99ba3c16bee91b"
   },
   {
-    "path": "cards-v08.js",
-    "sha256": "26ac3d6377d1912cf34bfa2847938e43d143acd8ca52f61fa018bfb43bff410e"
+    "path": "cards-v014.js",
+    "sha256": "12dfef5c2ccb3020a39a8f6710a65e0df1252fecb900a7ecfa9ab980de27aef5"
   },
   {
-    "path": "engine-v08.mjs",
-    "sha256": "50eecb72fabc6856064e7b135502ae3f52c288eab25bd9dd8885074f2dc4bc57"
+    "path": "engine-v014.mjs",
+    "sha256": "a94f962cabae1ccc3b6612654e64ee56ef9f038eafc28bd0fa9d1e7f2dd8cf1b"
   },
   {
     "path": "index.html",
-    "sha256": "9b62210b8e9b15d571c9801050f91ac6f52e9630a31a57ab7dd65fbad8430c73"
+    "sha256": "c365b95c56d7d414d37c68f55b349841c93bc86535d439218ff86f853fd25f9b"
   },
   {
     "path": "menu.js",
-    "sha256": "dc56a685727f721c4604dbe5885a768074e6873318bb6224e33b33876eaf9c3d"
+    "sha256": "baf74507affa204b8774bcf45a7456353116ef334f47bb006fc7cdb9e7da2670"
   },
   {
     "path": "polish.css",
     "sha256": "849ecad8b4bba4cfa2a5e01142e12ac6ca7f5a4055ce2851736be738de0d780e"
   },
   {
-    "path": "voyage-v08.css",
-    "sha256": "61cdbd95d0f269cd7df816ee180a5b24cb6a12845b00064a5774ea43dc3798d9"
+    "path": "voyage-v014.css",
+    "sha256": "f6642c49cc9f5c99a6c2e7e95a22384572a18f5dd5da1ed6d29ae6abfcd0931f"
   },
   {
-    "path": "voyage-v08.js",
-    "sha256": "e65fd3370175cd2d3ee1cac7a3afe9c0c30aa844d2619eba5d201b150a867b92"
+    "path": "voyage-v014.js",
+    "sha256": "ba5f3ae6a5995ad36f73b4354f258b233a9ae8da3333495394295ddc27074bd4"
+  },
+  {
+    "path": "voyage-v08.css",
+    "sha256": "61cdbd95d0f269cd7df816ee180a5b24cb6a12845b00064a5774ea43dc3798d9"
   }
 ]

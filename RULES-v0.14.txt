@@ -1,0 +1,1145 @@
+CAPTAIN'S DASH: THE FINAL ISLE
+MASTER RULES + CARD DATABASE
+THREE-STAT VERSION FOR INTERACTIVE WEB GAME
+Prototype v0.14 Final
+
+======================================================================
+0. GAME OVERVIEW
+======================================================================
+
+Title:
+Captain's Dash: The Final Isle
+
+Players:
+2–4
+
+Genre:
+Competitive pirate adventure / worker placement / mission selection /
+push-your-luck / resource progression
+
+Core objective:
+- Build a capable pirate crew
+- Gain Gold, Supply, Treasure, Crew and Veteran Crew
+- Progress through Zone I, Zone II and Zone III
+- Use Zone III to prepare for the Final Isle
+- Complete a Final Mission to win immediately
+
+Design intent:
+- Mission completion should be the primary engine for progression
+- Pirate Haven should be used for preparation, recruitment and recovery
+- Players should not need to repeatedly farm Gold/Supply for many turns
+- Final Isle should normally require a strong team containing multiple
+  Veteran Crew and Treasure cards
+- Final Mission should remain risky even for a well-prepared player
+
+======================================================================
+0.1. BOARD / NAVIGATION MODEL
+======================================================================
+
+[LOCKED]
+
+There is no island-number sequence.
+There are no route lines between islands.
+There is no forced movement path.
+
+When a Zone is unlocked:
+- A player may choose any currently face-up Mission in that Zone
+- Player Pirate Token moves from Pirate Haven to the chosen Mission
+- Resolve the Expedition
+- Token returns to Pirate Haven after resolution
+
+All players use the same pirate portrait token design.
+Different players are identified by player color / colored outer ring.
+
+No Treasure slot exists on individual islands.
+Treasure is drawn from one central Treasure Deck.
+
+Board zones:
+
+ZONE I
+- 3 Mission Stack slots
+- 2 Mission cards per stack
+- 3 face-up choices at a time
+
+ZONE II
+- 3 Mission Stack slots
+- 2 Mission cards per stack
+- 3 face-up choices at a time
+
+ZONE III
+- 2 Mission Stack slots
+- 2 Mission cards per stack
+- 2 face-up choices at a time
+
+FINAL ISLE
+- 1 Final Mission Stack
+- 3 Final Mission cards per game
+- Drawn randomly from 5 available Final Missions
+- Only the top Final Mission is active
+
+SHARED AREAS
+- Mission Discard
+- Crew Deck / Crew Market
+- Veteran / Elite recruitment area
+- Treasure Deck - 
+- Treasure Discard
+- Gold supply
+- Supply tokens
+- Pirate Haven worker locations
+- Player Pirate Tokens
+
+======================================================================
+1) CORE CONCEPT
+======================================================================
+
+เกมนี้ใช้ค่าพลัง 3 แบบบนการ์ด Crew
+
+Core Stats:
+- Combat  = ใช้ต่อสู้ / ผ่านภารกิจแนวโจมตี
+- Sailing = ใช้เดินเรือ / ผ่านภารกิจแนวการเดินทาง
+- Search  = ใช้ค้นหา / สำรวจ / ไขความลับ
+
+แนวคิดหลัก:
+
+- ในแต่ละ Mission Card จะมี Test Type เพียง 1 แบบ
+  คือ Combat หรือ Sailing หรือ Search
+- ผู้เล่นรวมค่าพลังชนิดนั้นจาก Crew ที่ร่วมภารกิจ
+- แล้วบวกผลลูกเต๋า
+- ถ้าถึงเป้าหมายจึงสำเร็จ
+
+ตัวอย่าง:
+- ถ้า Mission เป็น Combat 6
+  ให้ใช้เฉพาะค่า Combat ของ Crew + Treasure bonus ที่เกี่ยวข้อง + Dice
+- ค่า Sailing และ Search ของ Crew ใบนั้นไม่ถูกใช้ในการเช็กครั้งนั้น
+
+======================================================================
+2) TURN STRUCTURE / TOKEN PLACEMENT
+======================================================================
+
+ใช้ระบบ “วาง 1 ตัว → ทำ 1 Action → เก็บ 1 ตัว → ทำ 1 Action”
+
+ใน 1 Turn:
+A) Place 1 Pirate Token
+- วาง Pirate Token 1 ตัวของตนลงบน Location ที่ว่าง
+- Resolve Action ของ Location นั้นทันที
+
+B) Take 1 Pirate Token
+- เก็บ Pirate Token 1 ตัวของตนจาก “อีก” Location หนึ่งที่มี Token ของตนอยู่
+- ห้ามเก็บตัวที่เพิ่งวางใน Step A
+- Resolve Action ของ Location ที่เก็บออกมาทันที
+
+จากนั้น End Turn
+
+Important Rule:
+- You cannot take the Pirate you just placed.
+
+Recommended implementation note:
+- ถ้าในช่วงต้นเกมผู้เล่นยังไม่มี Token ของตนค้างอยู่บนกระดานพอสำหรับ Step B
+  ให้ระบบอนุญาตทำเฉพาะ Step A ใน Turn แรก ๆ ได้
+  หรือใช้เป็น implementation option ชั่วคราวระหว่างทำ prototype
+
+Pirate Tokens:
+- ใช้เป็น worker token
+- Player Token และ Crew Token ใช้รูปแบบเดียวกัน
+- แยกผู้เล่นด้วยสีเดียวกันทั้งชุดของผู้เล่นนั้น
+
+======================================================================
+3) PIRATE HAVEN LOCATIONS
+======================================================================
+
+Always Available (Starting Locations)
+
+1. Tavern
+ - มี การ์ด Crew ให้เลือก 3 ใบ (face up)
+- Recruit 1 face-up Crew by paying its Gold cost 
+
+2. Market
+- Buy up to 5 Supplies
+- Cost: 1 Gold each
+
+3. Dock
+- Launch an Expedition
+
+4. Harbor Work
+- Gain 3 Gold
+
+5. Crew Quarters
+- Ready up to 4 Exhausted Crew
+
+Unlockable Locations (global unlocks)
+
+6. Black Market
+Unlock after 1 Zone II Missions completed (globally)
+Effect:
+- Refresh up to 3 face-up Crew cards
+- Then recruit 1 Crew for 1 Gold less
+
+7. Veteran's Den
+Unlock after 2 Zone II Mission completed (globally)
+Effect
+ - มีการ์ด Veteran ให้เลือก 3 ใบ (face up)
+- Recruit 1 Veteran Crew by paying its Gold cost
+
+8. Sea Witch
+Unlock when Final Isle becomes accessible
+Effect:
+- Pay 3 Gold
+- Choose 1 Blessing for your next Expedition
+
+Sea Witch Blessings:
+- War Spirit: +3 Combat on your next Mission
+- Tailwind: +3 Sailing on your next Mission
+- True Sight: +3 Search on your next Mission
+- Fortune: reroll 1 non-Skull die and keep the new result
+
+======================================================================
+4) RESOURCES
+======================================================================
+
+Gold
+- ใช้ Recruit Crew
+- ซื้อ Supply
+- จ่ายบาง Ability / บาง Final Mission Step 1
+
+Supply
+- ต้องจ่ายก่อนเริ่ม Expedition
+- ถ้า Supply ไม่พอ เข้า Mission นั้นไม่ได้ ต้องไปเก็บ Supply ให้พอก่อน
+
+Current Supply Costs: 
+- Zone I     = 1 Supply
+- Zone II    = 3 Supply
+- Zone III   = 6 Supply
+- Final Isle = 9 Supply
+
+Treasure
+- เก็บ Treasure Card สูงสุด 3 ใบ ถ้ามีเกิน 3 ใบ ให้เลือกทิ้ง 1 ใบ
+- Treasure ไม่วางตามเกาะ แต่ได้จากมาทำ Mission Success แล้วได้จาก Mission Card
+- รับจาก Treasure Deck ส่วนกลาง ไม่สามารถเลือกได้
+- Bonus ที่ได้จาก Treasure เป็น Passive สามารถใช้ได้เรื่อยๆ
+
+Crew
+- เก็บสะสมเป็นคนเรือได้ไม่เกิน 4 ใบ
+-ใช้เข้าภารกิจได้สูงสุด 4 ใบต่อ Expedition
+
+Veteran
+- เป็น Crew ระดับสูง
+- แยกด้วย Veteran icon บนการ์ด
+
+======================================================================
+5) MISSION DIE
+======================================================================
+
+Faces:
+1. Skull
+2. 0
+3. 0
+4. 1
+5. 2
+6. Gold
+
+Meaning:
+- Skull = Fail immediately
+- 0 = +0
+- 1 = +1
+- 2 = +2
+- Gold = +0 result และรับ Gold 1
+
+Important:
+- ถ้ามี Skull อย่างน้อย 1 ลูก = ภารกิจล้มเหลวทันที
+- Gold ที่ออกยังได้รับแม้ Mission จะ Fail เพราะ Skull
+- Skull ห้าม reroll / cancel / modify
+
+Dice by Zone:
+- Zone I     = 1 die
+- Zone II    = 2 dice
+- Zone III   = 3 dice
+- Final Isle = 3 dice
+
+- เวลาทอยให้ทอยพร้อมกัน เช่น Zone II จะทอยพร้อมกัน 2 ลูก แล้วตรวจสอบเงื่อนไขเลยว่าชนะ Mission ไหม
+
+======================================================================
+6) HOW TO RESOLVE A MISSION
+======================================================================
+
+Mission Card จะมี:
+- Zone
+- Test Type (Combat / Sailing / Search)
+- Target Number
+- Reward
+
+Resolution:
+1. เลือก Mission ที่เปิดอยู่
+2. ใช้ Crew ที่เรามี
+3. ใช้ Treasure passive ability
+4. จ่าย Supply ตาม Zone ไปก่อนเลย
+5. ทอย Dice ตามจำนวนลูกเต๋าตาม Zone 
+6. รับ Gold จากหน้า Gold
+7. ถ้ามี Skull ที่ลูกใดลูกหนึ่ง = Fail ทันที
+8. ถ้าไม่มี Skull:
+   Relevant Crew Stat
+ + Relevant Treasure Bonus
+ + Dice Result
+ + Other bonuses
+   >= Target
+   = Success
+9. Final Mission จะเป็น 2-step ต้องเล่นให้ชนะสองรอบ
+
+Mission Failure:
+- ต้องเลือกเสีย Crew 1 ใบ
+- เว้นแต่มี ability ป้องกัน
+- Mission Zone I–III ใบนั้นยังคงอยู่ที่เดิม
+- Final Mission ที่แพ้จะถูกทิ้ง
+
+Mission Success:
+- ได้รางวัลตาม Mission card
+- ทิ้ง Mission card ที่กอง discard และเปิดใบที่เหลือ 
+- ถ้าเปิดครบก็ไม่ต้องเปิด 
+- Final Mission จะชนะ ให้ประกาศจบเกม แล้วบอกใครชนะ
+
+
+======================================================================
+7) MISSION BOARD SETUP
+======================================================================
+
+Zone I
+- สุ่ม 6 การ์ดจาก Zone I deck
+- ทำเป็น 3 กอง
+- กองละ 2 ใบ
+- เปิดใบบนสุดของแต่ละกอง
+- จึงมี Mission ให้เลือกพร้อมกัน 3 ใบ
+
+Zone II
+- สุ่ม 6 การ์ดจาก Zone II deck
+- ทำเป็น 3 กอง
+- กองละ 2 ใบ
+- เปิดใบบนสุดของแต่ละกอง
+
+Zone III
+- สุ่ม 4 การ์ดจาก Zone III deck
+- ทำเป็น 2 กอง
+- กองละ 2 ใบ
+- เปิดใบบนสุดของแต่ละกอง
+
+Final Isle
+- มี Final Mission ทั้งหมด 5 ใบ
+- แต่ละเกมสุ่มมาใช้ 3 ใบ
+- วางเป็นกองเดียว
+- เปิดเฉพาะใบบนสุด
+- ถ้า Final Mission ใบใด Fail ให้นำใบนั้นไป Mission Discard
+- ถ้า Final Mission เหลือใบสุดท้ายไม่ต้อง Discard
+
+======================================================================
+8) GLOBAL ZONE PROGRESSION
+======================================================================
+
+- เปิด Zone II เมื่อ Zone I สำเร็จรวม 2 ใบ (ถ้าเล่น 2 คน Zone II เปิดเลย)
+- เปิด Zone III เมื่อ Zone II สำเร็จรวม 2 ใบ
+- Final Isle เปิดเมื่อ Zone III สำเร็จรวม 1 ใบ
+
+Mission ที่สำเร็จของผู้เล่นคนหนึ่ง มีผลปลดล็อกให้ทุกคน
+
+======================================================================
+9) STARTING RESOURCES
+======================================================================
+
+Base Starting Resources
+- Player 1 = 2 Gold, 2 Supply, 1 Common Crew (Deckhand)
+
+Starting Bonus:
+- Player 2 = +1 Gold
+- Player 3 = +1 Gold +1 Supply
+- Player 4 = +1 Gold +1 Supply
+
+Starting setup by player seat:
+
+2-player game
+- Player 1 = 2 Gold, 2 Supply, 1 Common Crew 
+- Player 2 = 3 Gold, 2 Supply, 1 Common Crew 
+
+3-player game
+- Player 1 = 2 Gold, 2 Supply, 1 Common Crew 
+- Player 2 = 3 Gold, 2 Supply, 1 Common Crew
+- Player 3 = 3 Gold, 3 Supply, 1 Common Crew
+
+4-player game
+- Player 1 = 2 Gold, 2 Supply, 1 Common Crew
+- Player 2 = 3 Gold, 2 Supply, 1 Common Crew
+- Player 3 = 3 Gold, 3 Supply, 1 Common Crew
+- Player 4 = 3 Gold, 3 Supply, 1 Common Crew
+
+======================================================================
+10) CREW CARD FORMAT
+======================================================================
+
+ข้อมูลที่ต้องมีบนการ์ด Crew:
+- Name
+- Tier Icon (Common / Veteran)
+- Cost (Gold)
+- Combat
+- Sailing
+- Search
+- Ability Name
+- Ability Text
+
+Suggested art/UI:
+- Common icon  = silver compass / anchor badge
+- Veteran icon = gold star / medal badge
+
+======================================================================
+11) CREW CARDS (15 TYPES)
+======================================================================
+
+C01 DECKHAND
+Tier: Common
+Cost: 2 Gold
+Combat: 1
+Sailing: 1
+Search: 1
+Ability:
+- No special ability
+
+C02 HEAVY FIRE
+Tier: Common
+Cost: 3 Gold
+Combat: 3
+Sailing: 0
+Search: 0
+Ability: Bombardment
+- On a Combat Mission, gain +1 Combat
+
+C03 EXPERIENCED NAVIGATOR
+Tier: Veteran
+Cost: 6 Gold
+Combat: 0
+Sailing: 5
+Search: 1
+Ability: Sea Route
+- In Zone II, Zone III or Final Isle, gain +1 Sailing
+
+C04 SCOUT
+Tier: Common
+Cost: 3 Gold
+Combat: 0
+Sailing: 2
+Search: 2
+Ability: Keen Eye
+- On a Search Mission, reroll one die showing 0
+- You must keep the new result
+
+C05 RAIDER
+Tier: Common
+Cost: 3 Gold
+Combat: 1
+Sailing: 2
+Search: 1
+Ability: Plunder
+- After any Mission success, gain +2 Gold
+
+C06 QUARTERMASTER
+Tier: Veteran
+Cost: 6 Gold
+Combat: 3
+Sailing: 3
+Search: 2
+Ability: Prepared Crew
+- Spend 1 fewer Supply when starting an Expedition
+- Minimum cost remains 1
+
+C07 SHARPSHOOTER
+Tier: Veteran
+Cost: 6 Gold
+Combat: 5
+Sailing: 2
+Search: 2
+Ability: Take Aim
+- After rolling a Combat Mission without Skull,
+  reroll one die showing 0
+- You must keep the new result
+
+C08 SAILMASTER
+Tier: Common
+Cost: 3 Gold
+Combat: 0
+Sailing: 3
+Search: 0
+Ability: Full Sail
+- If this Crew joins a Zone II, Zone III or Final Mission,
+  gain +1 Sailing
+
+C09 TREASURE HUNTER
+Tier: Veteran
+Cost: 7 Gold
+Combat: 0
+Sailing: 3
+Search: 5
+Ability: Treasure Sense
+- When you gain Treasure, draw 2 and keep 1
+
+C10 BERSERKER
+Tier: Veteran
+Cost: 7 Gold
+Combat: 8
+Sailing: 0
+Search: 0
+Ability: Reckless Assault
+- On a Combat Mission, gain +1 Combat
+- If the Mission fails and you must lose 1 Crew,
+  Berserker must be lost first
+
+C11 SMUGGLER
+Tier: Common
+Cost: 3 Gold
+Combat: 1
+Sailing: 1
+Search: 2
+Ability: Black Market Connections
+- When this Mission succeeds, gain +1 Gold
+- On a Search Mission, gain +1 Search
+
+C12 SURGEON
+Tier: Common
+Cost: 4 Gold
+Combat: 0
+Sailing: 1
+Search: 0
+Ability: Patch Them Up
+- Once per Expedition, ignore one Crew loss caused by Mission failure
+
+C13 CARTOGRAPHER
+Tier: Common
+Cost: 5 Gold
+Combat: 1
+Sailing: 1
+Search: 3
+Ability: Chart the Unknown
+- Before selecting a Mission, you may look at the face-down card
+  beneath one Mission stack
+
+C14 VETERAN PIRATE
+Tier: Veteran
+Cost: 8 Gold
+Combat: 4
+Sailing: 4
+Search: 4
+Ability: Old Salt
+- After Mission success, ready 1 exhausted Crew
+
+C15 MASTER GUNNER
+Tier: Veteran
+Cost: 8 Gold
+Combat: 6
+Sailing: 3
+Search: 3
+Ability: Broadside
+- On a Combat Mission, one Gold result may also count as +1
+
+======================================================================
+12) TREASURE CARD FORMAT
+======================================================================
+
+ข้อมูลที่ต้องมีบนการ์ด Treasure:
+- Name
+- Type icon (Combat / Sailing / Search / Utility / Economy)
+- Ability text
+
+Treasure ไม่ต้องมีค่า Cost
+Treasure บางใบให้ stat bonus โดยตรง
+Treasure บางใบให้ economy / supply / protection
+
+======================================================================
+13) TREASURE CARDS (20 TYPES)
+======================================================================
+
+T01 ANCIENT COMPASS
+Type: Search / Utility
+Effect:
+- Gain +1 Search
+- Before selecting a Mission, look at the face-down card
+  beneath one Mission stack
+
+T02 ADMIRAL'S SPYGLASS
+Type: Search
+Effect:
+- Gain +1 Search
+- In Final Isle, gain +1 additional Search
+
+T03 STORMGLASS
+Type: Utility
+Effect:
+- If you fail a Mission without Skull, regain 1 Supply
+
+T04 WINDCALLER CONCH
+Type: Sailing
+Effect:
+- Gain +2 Sailing
+
+T05 SPANISH STEEL
+Type: Combat
+Effect:
+- Gain +2 Combat
+
+T06 ROYAL FLINTLOCK
+Type: Combat / Economy
+Effect:
+- On a Combat Mission, if at least one die shows 2, gain +1 Gold
+
+T07 BLACK POWDER HORN
+Type: Combat
+Effect:
+- Before rolling a Combat Mission, you may pay 1 extra Supply
+- If you do, gain +2 Combat
+
+T08 CRIMSON CAPTAIN'S SABRE
+Type: Combat / Economy
+Effect:
+- Gain +1 Combat
+- If a Combat Mission succeeds, gain +2 Gold
+
+T09 GOLDEN SPYGLASS
+Type: Economy
+Effect:
+- Each Gold die result gives +1 additional Gold
+
+T10 EXPLORER'S JOURNAL
+Type: Search / Supply
+Effect:
+- Gain +1 Search
+- On Mission success, gain +1 Supply
+
+T11 TEMPLE KEY
+Type: Utility
+Effect:
+- Once per Expedition, before paying Supply,
+  switch to another available Mission in the same Zone
+
+T12 CARTOGRAPHER'S ATLAS
+Type: Search / Economy
+Effect:
+- Gain +1 Search
+- If you complete a Search Mission with target 8 or more, gain +2 Gold
+
+T13 LUCKY DOUBLOON
+Type: Utility
+Effect:
+- If no Skull is rolled, gain +2 to the final result
+
+T14 LOADED BONES
+Type: Utility
+Effect:
+- If no Skull is rolled, change one die showing 0 into 1
+
+T15 FATE'S COIN
+Type: Economy
+Effect:
+- If you fail a Mission without Skull, gain +2 Gold
+
+T16 BLACK CAT CHARM
+Type: Economy
+Effect:
+- If you roll Skull and at least one Gold, gain +1 additional Gold
+
+T17 SMUGGLER'S LEDGER
+Type: Economy
+Effect:
+- On Mission success, gain +2 Gold
+
+T18 BOTTOMLESS RUM BARREL
+Type: Supply
+Effect:
+- Mission Supply cost -2
+- Minimum cost = 1
+
+T19 CAPTAIN'S MEDALLION
+Type: Protection
+Effect:
+- Discard this card to prevent losing 1 Crew when a Mission fails
+
+T20 CURSED CROWN
+Type: Economy
+Effect:
+- Mission success: gain +3 Gold
+- Mission failure: lose 1 Gold
+
+======================================================================
+14) MISSION CARD FORMAT
+======================================================================
+
+ข้อมูลบน Mission Card:
+- Mission Name
+- Zone
+- Test Type icon (Combat / Sailing / Search)
+- Target Number
+- Reward
+- Optional flavor art
+
+Important:
+- แต่ละ Mission ใช้พลัง “เพียง 1 ประเภท”
+- ผู้เล่นต้องผ่านค่าใดค่าหนึ่งตามที่การ์ดระบุ
+- ไม่มี entry requirement แยก
+- ไม่มี failure text แยกในแต่ละใบ
+- Failure ใช้กติกากลางของเกม
+
+======================================================================
+15) ZONE I MISSIONS (18)
+======================================================================
+
+Zone I
+Supply Cost: 1
+Dice: 1
+
+Z1-01 TAX COLLECTOR'S SLOOP
+Test: Combat
+Target: 3
+Reward:
+- Gold 5
+
+Z1-02 FORGOTTEN SHRINE
+Test: Search
+Target: 4
+Reward:
+- Treasure 1
+
+Z1-03 HIDDEN LAGOON
+Test: Sailing
+Target: 3
+Reward:
+- Supply 4
+
+Z1-04 STOLEN CARGO
+Test: Combat
+Target: 4
+Reward:
+- Gold 4
+- Supply 2
+
+Z1-05 MERCHANT IN DISTRESS
+Test: Sailing
+Target: 4
+Reward:
+- Crew 1
+- Supply 2
+
+Z1-06 PRISON BREAK
+Test: Combat
+Target: 4
+Reward:
+- Crew 1
+- Gold 3
+
+Z1-07 FISHERMAN'S SECRET
+Test: Search
+Target: 4
+Reward:
+- Supply 3
+- Gold 3
+
+Z1-08 CANNON ON THE CLIFF
+Test: Combat
+Target: 4
+Reward:
+- Gold 5
+- Supply 1
+
+Z1-09 TIDE CAVE
+Test: Search
+Target: 4
+Reward:
+- Treasure 1
+- Gold 3
+
+Z1-10 SMUGGLER'S CAMP
+Test: Sailing
+Target: 3
+Reward:
+- Supply 6
+
+Z1-11 WRECK OF SAINT MARA
+Test: Search
+Target: 3
+Reward:
+- Treasure 1
+- Supply 2
+
+Z1-12 BROKEN REEF PASSAGE
+Test: Sailing
+Target: 3
+Reward:
+- Gold 2
+- Supply 4
+
+Z1-13 RED JACK'S HIDEOUT
+Test: Combat
+Target: 4
+Reward:
+- Crew 1
+- Gold 4
+
+Z1-14 ABANDONED WATCHTOWER
+Test: Search
+Target: 4
+Reward:
+- Treasure 1
+- Gold 4
+
+Z1-15 RUM RUNNER CHASE
+Test: Sailing
+Target: 4
+Reward:
+- Gold 4
+- Supply 3
+
+Z1-16 MUTINEER'S COVE
+Test: Combat
+Target: 4
+Reward:
+- Crew 1
+- Supply 3
+
+Z1-17 MOONLIT GROTTO
+Test: Search
+Target: 5
+Reward:
+- Treasure 1
+- Supply 3
+
+Z1-18 CORAL MAZE
+Test: Sailing
+Target: 5
+Reward:
+- Gold 3
+- Treasure 1
+- Supply 1
+
+======================================================================
+16) ZONE II MISSIONS (14)
+======================================================================
+
+Zone II
+Supply Cost: 3
+Dice: 2
+
+Z2-01 GHOST SHIP BOARDING
+Test: Combat
+Target: 7
+Reward:
+- Gold 6
+- Treasure 1
+- Supply 3
+
+Z2-02 TEMPLE OF TIDES
+Test: Search
+Target: 7
+Reward:
+- Supply 8
+- Treasure 1
+
+Z2-03 GOVERNOR'S VAULT
+Test: Combat
+Target: 7
+Reward:
+- Gold 10
+
+Z2-04 STORM CHASERS
+Test: Sailing
+Target: 6
+Reward:
+- Supply 7
+- Gold 4
+
+Z2-05 CANNIBAL COAST
+Test: Combat
+Target: 8
+Reward:
+- Crew 1
+- Gold 5
+- Supply 3
+
+Z2-06 THE SMUGGLER KING
+Test: Search
+Target: 7
+Reward:
+- Supply 5
+- Gold 5
+
+Z2-07 CURSED ANCHORAGE
+Test: Search
+Target: 7
+Reward:
+- Treasure 1
+- Crew 1
+- Supply 3
+
+Z2-08 FORT CRIMSON
+Test: Combat
+Target: 7
+Reward:
+- Veteran 1
+- Supply 4
+- Gold 3
+
+Z2-09 DEVIL'S TEETH
+Test: Sailing
+Target: 6
+Reward:
+- Supply 8
+
+Z2-10 SUNKEN GALLEON
+Test: Search
+Target: 6
+Reward:
+- Treasure 1
+- Gold 4
+- Supply 2
+
+Z2-11 ROYAL CONVOY
+Test: Sailing
+Target: 7
+Reward:
+- Gold 7
+- Supply 4
+
+Z2-12 WHISPERING RUINS
+Test: Search
+Target: 7
+Reward:
+- Treasure 1
+- Supply 5
+
+Z2-13 BLACK CURRENT
+Test: Sailing
+Target: 7
+Reward:
+- Crew 1
+- Supply 5
+
+Z2-14 PIRATE HUNTERS
+Test: Combat
+Target: 7
+Reward:
+- Veteran 1
+- Supply 4
+
+======================================================================
+17) ZONE III MISSIONS (9)
+======================================================================
+
+Zone III
+Supply Cost: 6
+Dice: 3
+
+Design Goal:
+- Reward ต้องน่าสนใจมาก
+- เป็นพื้นที่สะสม Veteran / Treasure / Supply ก่อนเข้า Final Isle
+
+Z3-01 HUNT THE LEVIATHAN
+Test: Combat
+Target: 10
+Reward:
+- Supply 8
+- Gold 8
+- Treasure 1
+
+Z3-02 THE BLACK CITADEL
+Test: Combat
+Target: 10
+Reward:
+- Veteran 1
+- Supply 7
+- Gold 5
+
+Z3-03 TEMPLE OF THE DROWNED GOD
+Test: Search
+Target: 10
+Reward:
+- Veteran 2
+- Supply 6
+
+Z3-04 EYE OF THE MAELSTROM
+Test: Sailing
+Target: 10
+Reward:
+- Supply 12
+- Treasure 2
+
+Z3-05 ADMIRAL'S LAST FLEET
+Test: Combat
+Target: 10
+Reward:
+- Veteran 1
+- Gold 6
+- Supply 8
+
+Z3-06 THE ABYSSAL VAULT
+Test: Search
+Target: 10
+Reward:
+- Supply 8
+- Gold 6
+- Draw Treasure 2, Keep 1
+
+Z3-07 SIREN'S PASSAGE
+Test: Sailing
+Target: 10
+Reward:
+- Veteran 1
+- Treasure 1
+- Supply 8
+
+Z3-08 ISLE OF ASHES
+Test: Sailing
+Target: 9
+Reward:
+- Supply 9
+- Veteran 1
+- Gold 8
+
+Z3-09 THE PIRATE KING'S TRIAL
+Test: Combat
+Target: 10
+Reward:
+- Veteran 2
+- Treasure 1
+- Supply 10
+
+======================================================================
+18) FINAL ISLE RULE
+======================================================================
+
+Final Isle เปิดหลังจากมี Zone III Mission สำเร็จรวม 1 ใบ
+
+Final Mission rules:
+- Final deck มี 5 ใบ
+- สุ่มมาใช้ 3 ใบต่อเกม
+- เปิดใช้งานทีละใบ
+- แต่ละ Final Mission มี 2 Steps
+- Step 1 = First Test
+- Step 2 = Final Test
+- ถ้าสำเร็จ = ชนะเกมทันที
+- ถ้า Fail = เสีย Crew 1 ใบ และทิ้ง Final Mission ใบนั้น
+- เปิดใบถัดไป
+- ถ้า Final เหลือใบสุดท้ายให้ไม่ต้อง Discard
+
+======================================================================
+19) FINAL MISSIONS (8)
+======================================================================
+
+F1 THE LOST CITY OF ORO
+Step 1: Fight for Coward!
+- Test Type: Combat
+- Target: 10 
+Step 2: Treasure of the LOST CITY!
+- Test Type: Search
+- Target: 15
+Success:
+- WIN THE GAME
+
+F2 SKULL FORTRESS
+Step 1: Beware Whirlpool!
+- Test Type: Sailing
+- Target: 10
+Step 2: Fight the Guardian!
+- Test Type: Combat
+- Target: 15
+Success:
+- WIN THE GAME
+
+F3 THE CURSED TEMPLE
+Step 1: Search for your sage!
+- Pay 6 Gold
+OR discard 1 Treasure
+Reward:
+- Test Type: Search 
+- Target: 8
+Step 2: Fight for your life!
+- Test Type: Combat
+- Target: 15
+Success:
+- WIN THE GAME
+
+F4 THRONE OF THE PIRATE KING
+Step 1: Sail to the Throne of OUR KING
+Must have all:
+- 4 Crew
+- at least 2 Veteran
+- at least 2 Treasure
+
+- Test Type: Sail
+- Target: 8
+
+Step 2: Bring OUR PIRATE KING back!
+- Test Type: Search 
+- Target: 15
+Success:
+- WIN THE GAME
+
+F5 QUEEN OF THE SIRENS
+Step 1: Approach them!
+- At least 3 different Crew types
+- At least 1 Veteran
+
+- Test Type: Search 
+- Target: 8
+
+Step 2: Leave them alone!
+- Test Type: Sailing
+- Target: 15
+Success:
+- WIN THE GAME
+
+======================================================================
+20) DESIGN / UI SUMMARY FOR ART + WEB
+======================================================================
+
+Crew Card UI
+Must show clearly:
+- Name
+- Cost (Gold coin icon)
+- Combat / Sailing / Search with separate icons
+- Common or Veteran badge
+- Ability name + readable ability text
+
+Mission Card UI
+Must show clearly:
+- Mission name
+- Zone
+- Test Type icon (choose one of three)
+- Target number
+- Reward icons
+
+- เฉพาะการ์ด Final Mission ให้ใส่ชื่อ Step 1, 2 ไว้ด้วย
+
+Treasure Card UI
+Must show clearly:
+- Name
+- Ability icon type
+- Short readable effect text
+
+Map Board UI
+Must support:
+- Pirate Haven at bottom-left
+- Zone I -> Zone II -> Zone III -> Final Isle from lower-left to upper-right
+- Zone I = 3 mission stacks
+- Zone II = 3 mission stacks
+- Zone III = 2 mission stacks
+- Final = 1 active mission slot + final remaining indicator
+- Mission Discard
+- Crew Deck / Crew Market
+- Treasure Deck
+- Supply / Gold areas
+- Worker placement spaces in Pirate Haven
+
+======================================================================
+21) CURRENT SOURCE OF TRUTH SUMMARY
+======================================================================
+
+Card counts:
+- Crew = 15 types
+- Treasure = 20 types
+- Zone I Missions = 18
+- Zone II Missions = 14
+- Zone III Missions = 9
+- Final Missions = 5 total, use 3 per game
+
+======================================================================
+END OF CAPTAIN'S DASH THREE-STAT SPEC
+======================================================================

@@ -26,28 +26,23 @@
       o.connect(g); g.connect(audioCtx.destination); o.start(); g.gain.exponentialRampToValueAtTime(.0001,audioCtx.currentTime+dur); o.stop(audioCtx.currentTime+dur);
     } catch(e) {}
   }
+  const soundtrack=new Audio();
+  soundtrack.id='pirateMusic';
+  soundtrack.loop=true;
+  soundtrack.preload='metadata';
+  soundtrack.src=soundtrack.canPlayType('audio/ogg; codecs="vorbis"')?'assets/pirate-theme.ogg':'assets/pirate-theme.mp3';
+  document.body.appendChild(soundtrack);
+  let musicStarted=false;
   function toggleAmbient(force) {
     musicEnabled=force ?? !musicEnabled;
-    document.getElementById("musicBtn").style.opacity=musicEnabled?"1":".45";
-    if(!musicEnabled || settings.music<=0) {
-      if(ambientGain) ambientGain.gain.setTargetAtTime(0,audioCtx.currentTime,.15);
-      return;
-    }
-    try {
-      audioCtx ||= new (window.AudioContext||window.webkitAudioContext)();
-      if(!ambientNode) {
-        const buffer=audioCtx.createBuffer(1,audioCtx.sampleRate*2,audioCtx.sampleRate);
-        const data=buffer.getChannelData(0);
-        for(let i=0;i<data.length;i++) data[i]=(Math.random()*2-1)*.26;
-        const src=audioCtx.createBufferSource(); src.buffer=buffer; src.loop=true;
-        const filter=audioCtx.createBiquadFilter(); filter.type="lowpass"; filter.frequency.value=430;
-        ambientGain=audioCtx.createGain(); ambientGain.gain.value=0;
-        src.connect(filter); filter.connect(ambientGain); ambientGain.connect(audioCtx.destination); src.start();
-        ambientNode=src;
-      }
-      ambientGain.gain.setTargetAtTime((settings.music/100)*.035,audioCtx.currentTime,.3);
-    } catch(e) {}
+    soundtrack.volume=Math.max(0,Math.min(1,settings.music/100));
+    if(!musicEnabled||settings.music<=0) soundtrack.pause();
+    else {musicStarted=true;soundtrack.play().catch(()=>toast('Tap Music to start the soundtrack.'));}
+    document.querySelectorAll('[data-music-toggle],#musicBtn').forEach(b=>{b.style.opacity=musicEnabled?'1':'.45';b.setAttribute('aria-pressed',String(musicEnabled));});
   }
+  document.addEventListener('click',ev=>{if(ev.target.closest('[data-music-toggle]'))toggleAmbient();});
+  window.addEventListener('captainsdash:startgame',()=>toggleAmbient(musicEnabled));
+  document.addEventListener('visibilitychange',()=>{if(document.hidden)soundtrack.pause();else if(musicStarted&&musicEnabled&&settings.music>0)soundtrack.play().catch(()=>{});});
   function closePanels() {
     document.body.classList.remove("menu-modal-open");
     panels.forEach(p=>p.classList.remove("show"));
@@ -85,7 +80,7 @@
 
   function currentSetup() {
     return {
-      version:"rules-0.8.1",
+      version:"0.15",
       players:count,
       names:[...document.querySelectorAll("#names input")].map(x=>x.value.trim()||"Captain"),
       captains:captainNames.slice(0,count),
@@ -99,7 +94,7 @@
     refreshContinue();
   }
   function refreshContinue() {
-    const raw=localStorage.getItem("captainsDashRules08")||localStorage.getItem("captainsDashSetup");
+    const raw=localStorage.getItem("captainsDashRules015")||localStorage.getItem("captainsDashSetup");
     document.getElementById("continueBtn").disabled=!raw;
     document.getElementById("continueText").textContent=raw?"Resume your saved voyage":"No saved voyage yet";
   }
@@ -108,7 +103,7 @@
 
   document.getElementById("continueBtn").addEventListener("click",()=>{
     try {
-      const full=JSON.parse(localStorage.getItem("captainsDashRules08")||"null");
+      const full=JSON.parse(localStorage.getItem("captainsDashRules015")||"null");
       if(full&&full.players?.length){const sv={players:full.players.length,names:full.players.map(p=>p.name),captains:full.players.map(p=>p.captain),mode:full.mode||"local",updatedAt:Date.now()};setCount(sv.players,sv.names);gameMode=sv.mode;document.getElementById("voyageSummary").textContent=`${sv.players} Captains · Saved Full Game`;document.getElementById("roster").innerHTML=sv.names.map((n,i)=>`<span>${sv.captains[i]} — ${esc(n)}</span>`).join("");document.getElementById("transition").classList.add("show");window.dispatchEvent(new CustomEvent("captainsdash:startgame",{detail:{...sv,resume:true}}));return;}
       const st=JSON.parse(localStorage.getItem("captainsDashSetup")||"null");if(!st)return;setCount(Math.max(2,Math.min(4,st.players||2)),st.names);gameMode=st.mode||"local";openPanel("setup");toast("Saved voyage restored.");
     } catch(e){toast("Could not restore the saved game.")}
@@ -118,9 +113,9 @@
     document.querySelectorAll("#names input").forEach((x,i)=>x.value=shuffled[i]);
     clickSfx(620);
   });
-  function confirmNewVoyage(){return new Promise(resolve=>{const d=document.createElement('dialog');d.className='menuConfirm';d.innerHTML='<h2>Start a new voyage?</h2><p>This replaces the saved v0.8 voyage on this device.</p><div class="buttons"><button data-answer="no">Keep saved voyage</button><button data-answer="yes">Start new voyage</button></div>';document.body.appendChild(d);d.addEventListener('click',e=>{const a=e.target.closest('[data-answer]');if(a){d.close();d.remove();resolve(a.dataset.answer==='yes')}});d.addEventListener('cancel',()=>{d.remove();resolve(false)});d.showModal()})}
+  function confirmNewVoyage(){return new Promise(resolve=>{const d=document.createElement('dialog');d.className='menuConfirm';d.innerHTML='<h2>Start a new voyage?</h2><p>This replaces the saved v0.15 voyage on this device.</p><div class="buttons"><button data-answer="no">Keep saved voyage</button><button data-answer="yes">Start new voyage</button></div>';document.body.appendChild(d);d.addEventListener('click',e=>{const a=e.target.closest('[data-answer]');if(a){d.close();d.remove();resolve(a.dataset.answer==='yes')}});d.addEventListener('cancel',()=>{d.remove();resolve(false)});d.showModal()})}
   document.getElementById("startBtn").addEventListener("click",async()=>{
-    if(localStorage.getItem("captainsDashRules08")&&!await confirmNewVoyage())return;
+    if(localStorage.getItem("captainsDashRules015")&&!await confirmNewVoyage())return;
     saveSetup(); clickSfx(660,.08);
     const s=currentSetup();
     document.getElementById("voyageSummary").textContent=`${s.players} Captains · ${s.mode==="ai"?"Solo vs AI":"Local Pass & Play"} · Final Isle awaits`;
@@ -161,7 +156,7 @@
     try{if(!document.fullscreenElement) await document.documentElement.requestFullscreen(); else await document.exitFullscreen();}catch(e){toast("Fullscreen is not available in this browser.")}
   });
   document.getElementById("langBtn").addEventListener("click",()=>toast("Game language is English for this prototype."));
-  document.getElementById("guideNote").addEventListener("click",()=>toast("Master Specification v0.8 is the rules source of truth."));
+  document.getElementById("guideNote").addEventListener("click",()=>toast("Master Specification v0.15 is the rules source of truth."));
 
   document.addEventListener('keydown',e=>{if(e.key==='Escape')closePanels();if(e.key==='Tab'){const p=panels.find(p=>p.classList.contains('show'));if(!p)return;const els=[...p.querySelectorAll('button:not(:disabled),input,select:not(:disabled)')];const first=els[0],last=els.at(-1);if(e.shiftKey&&document.activeElement===first){e.preventDefault();last.focus()}else if(!e.shiftKey&&document.activeElement===last){e.preventDefault();first.focus()}}});
   window.addEventListener('captainsdash:startgame',closePanels);
