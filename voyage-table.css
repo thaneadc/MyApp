@@ -1,0 +1,40 @@
+/* Keep the illustrated board visible. Labels live in the artwork; rules open on tap. */
+#voyage{overflow:hidden;font-family:Georgia,'Times New Roman',serif}
+#voyage .vHud{min-height:62px;flex-wrap:nowrap;padding:7px 18px;background:#071b22;gap:10px}
+#voyage .vHud h1{font-size:23px;letter-spacing:.035em;font-weight:700}
+#voyage .vHud h1 small{display:block;font-size:12px;letter-spacing:.12em;text-transform:uppercase;margin-top:2px}
+#voyage .vHud .resources{font-size:18px;text-align:center}
+#voyage .vHud button{background:linear-gradient(#513721,#281b14);font-size:16px;padding:8px 14px;border-color:#987344}
+#voyage .vProgress{position:absolute;left:12px;top:110px;z-index:8;background:transparent;padding:0;gap:5px;pointer-events:none}
+#voyage .vProgress span{background:#061c25df;border:1px solid #b59b6755;border-radius:6px;padding:4px 8px;font:13px system-ui}
+#voyage .turnPrompt{height:40px;flex-shrink:0;padding:5px 12px;background:#071b22;border-bottom:1px solid #846538;color:#f4d892;font:700 21px/28px Georgia}
+#voyage .turnPrompt button{min-height:28px;padding:0 12px;margin-left:12px;font:14px system-ui}
+#voyage .vBoardScroll{min-height:0;place-items:center;position:relative;background:#052230}
+#voyage .vBoard:not(.zoomed){min-width:0;width:min(100cqw,calc(100cqh * 4 / 3));max-width:none}
+#voyage .vBoard.zoomed{min-width:1600px}
+#voyage .workerSpot{background:transparent!important;border:2px solid transparent!important;box-shadow:none!important;border-radius:7px!important;filter:none;color:transparent!important;overflow:visible;animation:none!important}
+#voyage .workerSpot.legal{background:#ffeaa50d!important;border:2px solid #fff1ac!important;box-shadow:0 0 0 2px #422c13a0,0 0 13px #ffd26c88!important;animation:none!important}
+#voyage .workerSpot.legal.take{background:#63d7ed15!important;border-color:#a0f1ff!important;box-shadow:0 0 10px #7ae0ff99!important}
+#voyage .workerSpot.sealed{background:#041b2470!important;border-color:transparent!important;backdrop-filter:grayscale(1)}
+#voyage .workerSpot.sealed .spotStatus{background:#122631e8;font-size:clamp(14px,2cqw,26px);padding:4px 10px}
+#voyage .workerSpot .silverHat{width:75%;height:72%;transform:none;filter:drop-shadow(0 3px 3px #000);position:absolute;bottom:0}
+.spotHint{position:absolute;top:-35px;background:#071b22;color:#ffe6a3;padding:5px 10px;border:1px solid #b99b58;border-radius:5px;white-space:nowrap;font:14px system-ui;visibility:hidden;z-index:20}
+.workerSpot:hover .spotHint,.workerSpot:focus-visible .spotHint{visibility:visible}
+#voyage .vFoot{display:none}
+#voyage .playerDock{display:flex;gap:8px;padding:7px 12px;background:#071b22;overflow-x:auto;border-top:1px solid #8b7048}
+#voyage .playerPanel{flex:1;min-width:175px;padding:7px 12px!important;border-top:2px solid var(--captain)!important;border-radius:7px;background:#10232b!important}
+#voyage .playerPanel strong{font-size:17px;color:#f4e5c5}
+#voyage .playerPanel small{font:10px system-ui;align-self:center;letter-spacing:.06em}
+#voyage .playerNumbers{display:flex;justify-content:space-between;gap:10px;font:12px system-ui;margin-top:5px}
+#voyage .playerNumbers b{font-size:17px}
+#voyage .miniRoster{display:none}
+#voyage .vSlot .slotInfo{font:700 clamp(11px,1.2cqw,19px) Georgia;background:#071c25ee;padding:3px}
+#voyage .mapCredit{font-size:clamp(8px,1cqw,14px);padding:2px 6px}
+#voyage .finalCount{height:6%;top:31.5%;border-radius:12px;background:#dfc393}
+#voyage .finalCount span{width:18%;height:auto;aspect-ratio:1;max-width:30px}
+#voyageDialog{font:17px/1.5 system-ui;background:#0b2631;border-radius:12px}
+#voyageDialog>header{background:#081d26;padding:12px 20px}
+#voyageDialog h2{color:#f3d797;font-size:30px}
+#voyageBody button:disabled{opacity:.6;cursor:not-allowed}
+.pirateBanter{font-size:18px;padding:10px 15px;margin-bottom:14px}
+@media(max-width:760px){#voyage .vHud{padding:5px 8px;gap:5px;min-height:50px}#voyage .vHud h1{display:none}#voyage .vHud button{font-size:14px;padding:5px 9px;min-height:40px}#voyage .vHud .resources{font-size:16px;text-align:left}#voyage .turnPrompt{font-size:17px;height:38px}#voyage .vProgress{top:94px;left:5px}#voyage .vProgress span{font-size:11px;padding:3px 5px}#voyage .playerPanel{min-width:165px}#voyage .playerPanel strong{font-size:15px}#voyage .playerNumbers{gap:5px;font-size:11px}#voyage .playerDock{padding:6px}#voyage .vSlot .slotInfo{font-size:10px}}

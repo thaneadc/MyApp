@@ -10,7 +10,7 @@ export const banter={
 };
 export function reducedMotion(){return matchMedia('(prefers-reduced-motion: reduce)').matches||document.body.classList.contains('reduce')}
 export function hat(){return '<img class="silverHat" src="assets/silver-pirate-hat.png" alt="Shared silver pirate hat">'}
-export function workerHtml(s,id,label){const legal=!s.location&&!s.exp&&!s.overflow,occupied=s.workers[id]!==null;return `<span class="spotName">${label}</span>${occupied?hat():''}<span class="spotStatus">${legal?(s.phase==='take'?(occupied&&s.placed!==id?'TAKE ↑':occupied?'JUST PLACED':'EMPTY'):(occupied?'OCCUPIED':'PLACE ↓')):'RESOLVING'}</span>`}
+export function workerHtml(s,id,label){const occupied=s.workers[id]!==null;return `${occupied?hat():''}<span class="spotHint">${label}</span>`}
 export function animateWorker(root,id,phase,done){const spot=root.querySelector(`[data-worker="${id}"]`);if(!spot||reducedMotion()){done();return}const ghost=document.createElement('span');ghost.className='movingHat '+phase;ghost.innerHTML=hat();spot.append(ghost);root.setAttribute('aria-busy','true');setTimeout(()=>{ghost.remove();root.removeAttribute('aria-busy');done()},480)}
 export function resultFlash(host,success,step=false){const el=document.createElement('div');el.className='missionFlash '+(success?'success':'failure');el.setAttribute('role','status');el.innerHTML=`<span>${success?'✦':'☠'}</span><strong>${step?'FIRST TEST CONQUERED!':success?'MISSION CONQUERED!':'THE SEA BITES BACK!'}</strong><p>${step?'One more test, Captain. Keep your hat on.':success?'A fine haul. Try not to look too smug.':'We lost this one. The legend is not over.'}</p>`;host.append(el);setTimeout(()=>el.remove(),reducedMotion()?900:1700)}
 export const endings={

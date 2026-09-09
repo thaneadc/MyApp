@@ -253,7 +253,7 @@
   },
   {
     "path": "index.html",
-    "sha256": "5a5a960609541b24b9e57c7b2f560e7910770fb34b0668894a34ae73a92d90c2"
+    "sha256": "cc11e1b0380d7a7b03089a0c017f4d12307b008f7f7712195144c523ccfe4e48"
   },
   {
     "path": "menu.js",
@@ -269,7 +269,11 @@
   },
   {
     "path": "voyage-flair.js",
-    "sha256": "8f529e0625fa7adae8ddd23fadf29302b079e8dae6d1d13d95c5cb800ae394d1"
+    "sha256": "6a921af417d9e4f6a1684394f353bf40300ae56523fcd7a14f2b101c071ca181"
+  },
+  {
+    "path": "voyage-table.css",
+    "sha256": "86d108507aa9e1f18c15db395039d44f9fa41cd9551f5f8107cbccde5f5cfe65"
   },
   {
     "path": "voyage-v014.css",
@@ -277,7 +281,7 @@
   },
   {
     "path": "voyage-v014.js",
-    "sha256": "182c82bdd5f9d621aae78fb61e0feab06c9c667ddf5a14fcee7329ea7c693c18"
+    "sha256": "b69a4db4e4e5723102f72cdb5a4606adf3a39585f486a942d358fac10fa690be"
   },
   {
     "path": "voyage-v08.css",
