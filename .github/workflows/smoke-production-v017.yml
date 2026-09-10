@@ -1,0 +1,41 @@
+name: Smoke Test Captain's Dash v0.17 Production
+
+on:
+  push:
+    branches:
+      - 'release/v0.17'
+    paths:
+      - '.github/workflows/smoke-production-v017.yml'
+
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Verify production serves v0.17
+        shell: bash
+        run: |
+          set -euo pipefail
+          urls=(
+            "https://captains-dash-the-final-isle-thaneadc-5337s-projects.vercel.app/"
+            "https://captains-dash-the-final-isle.vercel.app/"
+          )
+          ok=0
+          for attempt in $(seq 1 12); do
+            for url in "${urls[@]}"; do
+              echo "Attempt $attempt: $url"
+              code=$(curl -L -sS -o /tmp/page.html -w '%{http_code}' --max-time 20 "$url" || true)
+              echo "HTTP $code"
+              if [ "$code" = "200" ] && grep -q "v0.17 TEST" /tmp/page.html; then
+                echo "PRODUCTION_V017_OK=$url"
+                grep -o "CAPTAIN'S DASH · FULL GAME · v0.17 TEST" /tmp/page.html | head -1
+                ok=1
+                break 2
+              fi
+            done
+            sleep 5
+          done
+          if [ "$ok" != "1" ]; then
+            echo "Production alias did not serve the v0.17 marker."
+            head -c 600 /tmp/page.html || true
+            exit 1
+          fi
