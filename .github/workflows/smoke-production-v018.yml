@@ -1,0 +1,36 @@
+name: Smoke Test Captain's Dash v0.18 Production
+
+on:
+  push:
+    branches:
+      - 'release/v0.18'
+    paths:
+      - '.github/workflows/smoke-production-v018.yml'
+
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Verify production serves v0.18 and new art assets
+        shell: bash
+        run: |
+          set -euo pipefail
+          base="https://captains-dash-the-final-isle.vercel.app"
+          ok=0
+          for attempt in $(seq 1 12); do
+            echo "Attempt $attempt"
+            code=$(curl -L -sS -o /tmp/page.html -w '%{http_code}' --max-time 20 "$base/" || true)
+            if [ "$code" = "200" ] && grep -q "v0.18 TEST" /tmp/page.html; then
+              loc=$(curl -L -sS -o /tmp/loc.jpg -w '%{http_code}' --max-time 20 "$base/assets/locations-v018.jpg" || true)
+              res=$(curl -L -sS -o /tmp/res.jpg -w '%{http_code}' --max-time 20 "$base/assets/resources-v018.jpg" || true)
+              if [ "$loc" = "200" ] && [ "$res" = "200" ] && [ $(wc -c </tmp/loc.jpg) -gt 90000 ] && [ $(wc -c </tmp/res.jpg) -gt 19000 ]; then
+                echo "PRODUCTION_V018_OK=$base/"
+                echo "HTML=$code locations=$loc resources=$res"
+                grep -o "CAPTAIN'S DASH · FULL GAME · v0.18 TEST" /tmp/page.html | head -1
+                ok=1
+                break
+              fi
+            fi
+            sleep 5
+          done
+          test "$ok" = "1"
