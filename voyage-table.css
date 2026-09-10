@@ -106,3 +106,15 @@
 .zoneLocked .zoneCards{filter:none!important;opacity:1!important}
 .zoneLocked .missionTile{display:none!important}
 @media(max-width:850px){.lockedMissionVeil{min-height:130px;padding:14px 9px}.lockedMissionVeil .lockedMissionIcon{font-size:28px}.lockedMissionVeil strong{font-size:18px}.lockedMissionVeil small{font-size:10px}}
+
+
+/* v0.19 dock board selection + locked-zone card backs */
+.lockedMissionVeil{display:none!important}
+.zoneLocked .zoneCards{gap:10px;align-items:center;justify-content:center}
+.missionCardBack{flex:1;min-width:0;max-width:154px;aspect-ratio:2/3;max-height:100%;border:5px double #c59a50;border-radius:10px;background:radial-gradient(circle at 50% 44%,#274f5d 0 16%,#0e303d 17% 44%,#071e29 45% 100%);box-shadow:0 6px 12px #0009,inset 0 0 0 3px #06151d,inset 0 0 0 5px #b98d4528;display:flex;flex-direction:column;align-items:center;justify-content:center;color:#e6c87e;text-align:center;pointer-events:none;position:relative;overflow:hidden}
+.missionCardBack:before,.missionCardBack:after{content:'';position:absolute;inset:9px;border:1px solid #d4ae6460;border-radius:6px}.missionCardBack:after{inset:18px;border-style:dashed;opacity:.65}.missionCardBack .cardBackSkull{font-size:42px;line-height:1;filter:drop-shadow(0 3px 3px #000);margin-bottom:10px}.missionCardBack strong{font:700 clamp(10px,.9vw,14px) Georgia;letter-spacing:.08em;z-index:1}.missionCardBack small{font:700 9px system-ui;letter-spacing:.18em;margin-top:4px;color:#c6a75f;z-index:1}.zone4 .missionCardBack{max-width:158px}
+#voyage .missionTile.dockSelectable{cursor:pointer;outline:4px solid #8ff5ff;box-shadow:0 0 0 4px #08677a88,0 0 30px #6ee7ff,0 7px 13px #000a;animation:dockMissionGlow .8s ease-in-out infinite alternate;transform:translateY(-3px)}
+#voyage .missionTile.dockUnavailable{filter:grayscale(.65) brightness(.58);opacity:.52;cursor:not-allowed;box-shadow:0 4px 8px #0008}
+@keyframes dockMissionGlow{from{box-shadow:0 0 0 3px #08677a77,0 0 18px #6ee7ff99,0 7px 13px #000a}to{box-shadow:0 0 0 5px #0d799488,0 0 34px #8ff5ff,0 7px 13px #000a}}
+@media(max-width:850px){.missionCardBack{max-width:120px}.missionCardBack .cardBackSkull{font-size:32px}#voyage .missionTile.dockSelectable{outline-width:3px}}
+@media(prefers-reduced-motion:reduce){#voyage .missionTile.dockSelectable{animation:none}}
