@@ -140,6 +140,10 @@
     "sha256": "aa4dd571247e1717b2c94e6541f0a87590a078d7c2f648ac81f1558be3bed3c8"
   },
   {
+    "path": "assets/archipelago-v016.png",
+    "sha256": "4657d7155673211f974ef4589d82b4410c1fe66b31acd8e023d0e991d34a7534"
+  },
+  {
     "path": "assets/b66065b4e916b66f.webp",
     "sha256": "b66065b4e916b66fd6ee0065261e99ea4ef7f536ea7d8174ca8ce22275293d94"
   },
@@ -273,7 +277,7 @@
   },
   {
     "path": "voyage-table.css",
-    "sha256": "86d108507aa9e1f18c15db395039d44f9fa41cd9551f5f8107cbccde5f5cfe65"
+    "sha256": "32cfb7a34f89daf0f99b10bb3cfdb5b2b2e82d5ff35a1f5cb1d00e41bf6aac07"
   },
   {
     "path": "voyage-v014.css",
@@ -281,7 +285,7 @@
   },
   {
     "path": "voyage-v014.js",
-    "sha256": "b69a4db4e4e5723102f72cdb5a4606adf3a39585f486a942d358fac10fa690be"
+    "sha256": "2145c18a8a494e803fe323a0bc0d93592504b5be0579c32ceab1677014c59314"
   },
   {
     "path": "voyage-v08.css",
