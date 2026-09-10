@@ -1,12 +1,6 @@
 name: Build Captain's Dash v0.19
 
 on:
-  push:
-    branches:
-      - 'release/v0.19'
-    paths:
-      - '.github/workflows/release-v019.yml'
-      - 'scripts/release_v019.py'
   workflow_dispatch:
 
 permissions:
@@ -50,15 +44,3 @@ jobs:
           grep -q "Choose a glowing Mission card on the board" dist/voyage-v014.js
           grep -q "dockMissionGlow" dist/voyage-table.css
           echo "v0.19 dock selection and locked-zone card backs verified"
-
-      - name: Commit v0.19 implementation
-        run: |
-          git config user.name "captains-dash-build-bot"
-          git config user.email "actions@users.noreply.github.com"
-          git add voyage-v014.js voyage-table.css package.json package-lock.json
-          if git diff --cached --quiet; then
-            echo "v0.19 files already up to date"
-          else
-            git commit -m "Finalize v0.19 dock mission selection and locked card backs"
-            git push origin HEAD:release/v0.19
-          fi
