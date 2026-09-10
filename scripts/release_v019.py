@@ -17,6 +17,10 @@ end_marker = "}).join('')}</div></section>"
 end = s.index(end_marker, start) + len("}).join('')}</div>")
 old = s[start:end]
 payload = old[len('<div class="zoneCards">${'):-len('</div>')]
+# The original template expression contributes its own final `}`. Remove it
+# before wrapping that expression in the new open/locked ternary.
+if payload.endswith('}'):
+    payload = payload[:-1]
 new = '<div class="zoneCards">${open?' + payload + ':`<div class="lockedMissionVeil" aria-label="Mission cards hidden until this zone unlocks"><span class="lockedMissionIcon">🔒</span><strong>Missions Hidden</strong><small>Unlock this zone to reveal its Mission cards.</small></div>`}</div>'
 s = s[:start] + new + s[end:]
 s = replace_once(s, 'The Final Isle · v0.18', 'The Final Isle · v0.19', 'HUD version')
