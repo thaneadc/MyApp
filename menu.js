@@ -8,6 +8,7 @@
   const captainNames=["Captain Anne","Captain Black","Captain Morgan","Captain Silver"];
   const colors=["#c9302c","#1f76b4","#21924a","#d7aa1d"];
   const seaNames=["Anne","Black","Morgan","Silver","Flint","Rackham","Bonny","Vane","Drake","Kidd","Read","Bellamy"];
+  const aiNames=["AI Blackbeard","AI Morgan","AI Silver"];
   let count=2;
   let gameMode="local";
   let settings={music:35,sfx:60,hints:true,reduceMotion:false,autoSave:true};
@@ -66,21 +67,38 @@
     }
     document.querySelectorAll(".captain").forEach((c,i)=>c.classList.toggle("inactive",i>=count));
   }
-  function setCount(n, values) {
-    count=n;
-    document.querySelectorAll("[data-count]").forEach(b=>b.classList.toggle("on",+b.dataset.count===n));
-    renderNames(values);
+  function syncModeNames() {
+    const ins=[...document.querySelectorAll("#names input")];
+    ins.forEach((x,i)=>{
+      const ai=gameMode==="ai"&&i>0;
+      x.readOnly=ai;
+      x.classList.toggle("aiName",ai);
+      if(ai)x.value=aiNames[i-1]||`AI Captain ${i}`;
+    });
   }
-  document.querySelectorAll("[data-count]").forEach(b=>b.addEventListener("click",()=>{setCount(gameMode==="ai"?2:+b.dataset.count);clickSfx(500)}));
+  function setCount(n, values) {
+    count=Math.max(2,Math.min(4,n));
+    document.querySelectorAll("[data-count]").forEach(b=>b.classList.toggle("on",+b.dataset.count===count));
+    renderNames(values);
+    syncModeNames();
+  }
+  document.querySelectorAll("[data-count]").forEach(b=>b.addEventListener("click",()=>{
+    const values=[...document.querySelectorAll("#names input")].map(x=>x.value);
+    setCount(+b.dataset.count,values);
+    clickSfx(500);
+  }));
   renderNames();
+  syncModeNames();
   document.querySelectorAll("[data-game-mode]").forEach(b=>b.addEventListener("click",()=>{
+    const values=[...document.querySelectorAll("#names input")].map(x=>x.value);
     gameMode=b.dataset.gameMode;document.querySelectorAll("[data-game-mode]").forEach(x=>x.classList.toggle("on",x===b));
-    if(gameMode==="ai"){setCount(2);const ins=[...document.querySelectorAll("#names input")];if(ins[1])ins[1].value="AI Blackbeard";}clickSfx(510);
+    setCount(count,values);
+    clickSfx(510);
   }));
 
   function currentSetup() {
     return {
-      version:"0.15",
+      version:"0.17",
       players:count,
       names:[...document.querySelectorAll("#names input")].map(x=>x.value.trim()||"Captain"),
       captains:captainNames.slice(0,count),
@@ -110,15 +128,16 @@
   });
   document.getElementById("randomNames").addEventListener("click",()=>{
     const shuffled=[...seaNames].sort(()=>Math.random()-.5);
-    document.querySelectorAll("#names input").forEach((x,i)=>x.value=shuffled[i]);
+    document.querySelectorAll("#names input").forEach((x,i)=>{if(gameMode!=="ai"||i===0)x.value=shuffled[i]});
+    syncModeNames();
     clickSfx(620);
   });
-  function confirmNewVoyage(){return new Promise(resolve=>{const d=document.createElement('dialog');d.className='menuConfirm';d.innerHTML='<h2>Start a new voyage?</h2><p>This replaces the saved v0.15 voyage on this device.</p><div class="buttons"><button data-answer="no">Keep saved voyage</button><button data-answer="yes">Start new voyage</button></div>';document.body.appendChild(d);d.addEventListener('click',e=>{const a=e.target.closest('[data-answer]');if(a){d.close();d.remove();resolve(a.dataset.answer==='yes')}});d.addEventListener('cancel',()=>{d.remove();resolve(false)});d.showModal()})}
+  function confirmNewVoyage(){return new Promise(resolve=>{const d=document.createElement('dialog');d.className='menuConfirm';d.innerHTML='<h2>Start a new voyage?</h2><p>This replaces the saved voyage on this device.</p><div class="buttons"><button data-answer="no">Keep saved voyage</button><button data-answer="yes">Start new voyage</button></div>';document.body.appendChild(d);d.addEventListener('click',e=>{const a=e.target.closest('[data-answer]');if(a){d.close();d.remove();resolve(a.dataset.answer==='yes')}});d.addEventListener('cancel',()=>{d.remove();resolve(false)});d.showModal()})}
   document.getElementById("startBtn").addEventListener("click",async()=>{
     if(localStorage.getItem("captainsDashRules015")&&!await confirmNewVoyage())return;
     saveSetup(); clickSfx(660,.08);
     const s=currentSetup();
-    document.getElementById("voyageSummary").textContent=`${s.players} Captains · ${s.mode==="ai"?"Solo vs AI":"Local Pass & Play"} · Final Isle awaits`;
+    document.getElementById("voyageSummary").textContent=`${s.players} Captains · ${s.mode==="ai"?"1 Human + "+(s.players-1)+" AI":"Local Pass & Play"} · Final Isle awaits`;
     document.getElementById("roster").innerHTML=s.names.map((n,i)=>`<span>${captainNames[i]} — ${esc(n)}</span>`).join("");
     document.getElementById("transition").classList.add("show");
     window.dispatchEvent(new CustomEvent("captainsdash:startgame",{detail:s}));

@@ -24,3 +24,45 @@
 @media(max-width:850px){#voyage .vHud{height:68px;padding:6px;gap:6px}#voyage .vHud h1{display:none}.roundTitle strong{font-size:20px}#voyage .vHud button{font-size:14px;padding:6px 9px}.atlasBoard{overflow:auto;grid-template-columns:1fr 1fr;grid-template-rows:280px 260px 250px;display:grid;min-height:0;padding:8px}.zone1{grid-area:1/1}.zone2{grid-area:1/2}.zone3{grid-area:2/1}.zone4{grid-area:2/2}.havenPanel{grid-area:3/1}.recruitPanel{grid-area:3/2}.atlasArt{position:fixed;top:68px;bottom:85px}.zoneCards{gap:5px}.atlasBoard header{padding:5px}.atlasBoard h2{font-size:17px}.atlasBoard header span{font-size:11px}#voyage .playerPanel{min-width:190px;gap:7px}.captainPortrait{width:42px;height:49px}.playerPanel strong{font-size:15px}.playerNumbers{font-size:12px}.playerNumbers b{font-size:14px}.vSplit{display:block}.vForm{margin-top:20px}.vGrid{grid-template-columns:repeat(auto-fit,minmax(245px,310px))}}
 
 .atlasBoard.zoomedAtlas{overflow:auto;grid-template-columns:420px 420px 320px 230px;grid-template-rows:400px 320px}.zoomedAtlas .zone1{grid-area:1/1}.zoomedAtlas .zone2{grid-area:1/2}.zoomedAtlas .zone3{grid-area:1/3}.zoomedAtlas .zone4{grid-area:1/4/3/5}.zoomedAtlas .havenPanel{grid-area:2/1}.zoomedAtlas .recruitPanel{grid-area:2/2/3/4}
+
+
+/* v0.17 — larger Pirate Haven token spaces, compact Crew market, Veteran/Treasure decks, Final Test top-right, visible AI turns. */
+@media (min-width:851px){
+  .atlasBoard{grid-template-columns:28% 28% 24% 20%;grid-template-rows:55% 45%;padding:10px 12px 14px}
+  .zone1{grid-area:1/1}.zone2{grid-area:1/2}.zone3{grid-area:1/3}
+  .zone4{grid-area:1/4/2/5;justify-content:flex-start;padding:6px 7px 2px}
+  .zone4 header{margin-bottom:6px;padding:5px 9px}
+  .zone4 .zoneCards{flex:1;align-items:flex-start;justify-content:center}
+  .zone4 .missionTile{width:min(100%,158px);max-width:158px;max-height:245px}
+  .havenPanel{grid-area:2/1/3/3;justify-content:flex-end;align-self:stretch;padding:6px 12px 8px}
+  .havenPanel header{margin-bottom:8px;padding:5px 22px}
+  .havenSpaces{grid-template-columns:repeat(4,minmax(0,1fr));gap:9px;width:100%;height:100%}
+  #voyage .havenSpace{min-height:78px;padding:9px 5px;border-width:3px;border-radius:9px}
+  .locationSymbol{font-size:34px}
+  .havenSpace strong{font-size:clamp(12px,1.05vw,16px)}
+  .havenSpace .silverHat{width:58px;height:48px;right:3px;top:3px}
+  .recruitPanel{grid-area:2/3/3/5;justify-content:flex-end;align-items:stretch;padding:6px 8px 8px}
+  .recruitPanel header{align-self:center;margin-bottom:5px;padding:4px 18px}
+  .recruitBody{display:flex;gap:10px;align-items:stretch;min-height:0;flex:1;width:100%}
+  .marketGroup{display:flex;flex-direction:column;min-width:0;flex:1.35}
+  .shelfLabel{display:flex;align-items:center;justify-content:space-between;gap:8px;color:#ffe7ad;font:12px system-ui;padding:0 2px 4px;text-shadow:0 1px 2px #000}
+  .shelfLabel b{font:700 14px Georgia}.shelfLabel small{font-size:10px;color:#d8cfba}
+  .marketTiles{gap:7px;justify-content:space-between;height:auto;flex:1;min-height:0}
+  #voyage .marketTile{width:31%;max-width:102px;min-height:112px;padding:3px;border-width:2px}
+  .marketTile strong{font-size:10px;padding:2px;min-height:2.3em;display:grid;place-items:center}
+  .marketTile>span{font-size:11px}
+  .deckShelf{display:flex;gap:8px;justify-content:flex-end;align-items:stretch;flex:.9;min-width:150px}
+  .deckSlot{position:relative;flex:1;min-width:68px;max-width:102px;border:4px double #c99f55;border-radius:9px;background:linear-gradient(145deg,#183f4a,#0b2731 58%,#061b23);box-shadow:0 5px 10px #0008,inset 0 0 0 1px #f2da9226;color:#f1d79a;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:8px 5px;overflow:hidden}
+  .deckSlot:before{content:'';position:absolute;inset:5px;border:1px solid #d6b46355;border-radius:5px;pointer-events:none}
+  .deckSlot .deckIcon{font-size:32px;line-height:1;margin-bottom:8px}.deckSlot strong{font:700 15px Georgia}.deckSlot small{font:9px/1.25 system-ui;margin-top:7px;color:#d8c9a8;max-width:90px}
+  .treasureSlot{background:linear-gradient(145deg,#5b421f,#2b2012 60%,#17130c)}
+  .veteranSlot.locked{filter:saturate(.35) brightness(.72)}.deckLock{position:absolute;right:5px;top:4px;font-size:18px;filter:none}
+}
+.aiTurnBanner{position:absolute;z-index:65;top:84px;left:50%;transform:translateX(-50%);display:flex;align-items:center;gap:11px;min-width:300px;max-width:min(520px,72vw);padding:8px 18px 8px 9px;border:2px solid #f0c664;border-radius:999px;background:linear-gradient(90deg,#102f3bf2,#071d27f2);box-shadow:0 8px 24px #000a,0 0 24px #d8ae4938;color:#f4dfae;pointer-events:none;animation:aiBannerIn .32s ease-out}
+.aiTurnBanner img{width:44px;height:44px;object-fit:cover;border-radius:50%;border:2px solid #c9a354}.aiTurnBanner div{display:grid;grid-template-columns:auto 1fr;column-gap:8px;align-items:baseline;min-width:0}.aiTurnBanner small{font:700 10px system-ui;letter-spacing:.13em;color:#8fe4ff}.aiTurnBanner strong{font:700 17px Georgia;white-space:nowrap}.aiTurnBanner span{grid-column:1/3;font:12px system-ui;color:#d7d4c9;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.aiTurnBanner i{width:9px;height:9px;border-radius:50%;background:#8fe4ff;box-shadow:0 0 0 0 #8fe4ff88;animation:aiThinking 1.15s infinite}
+#voyage .havenSpace.aiChosen{outline:4px solid #7ee7ff!important;box-shadow:0 0 0 5px #0b526b99,0 0 28px #6eddf2!important;animation:aiSpacePulse .85s ease-in-out infinite alternate}
+@keyframes aiBannerIn{from{opacity:0;transform:translate(-50%,-12px) scale(.96)}to{opacity:1;transform:translateX(-50%) scale(1)}}
+@keyframes aiThinking{70%{box-shadow:0 0 0 9px #8fe4ff00}100%{box-shadow:0 0 0 0 #8fe4ff00}}
+@keyframes aiSpacePulse{from{transform:scale(1)}to{transform:scale(1.025)}}
+@media(max-width:850px){.aiTurnBanner{top:74px;min-width:250px;max-width:80vw}.recruitBody{display:flex;gap:7px}.marketGroup{min-width:0;flex:1}.deckShelf{display:flex;gap:5px;width:150px}.deckSlot{flex:1;min-width:0;padding:5px}.deckSlot .deckIcon{font-size:24px}.deckSlot strong{font-size:12px}.deckSlot small{font-size:8px}}
+@media(prefers-reduced-motion:reduce){.aiTurnBanner,#voyage .havenSpace.aiChosen,.aiTurnBanner i{animation:none!important}}
