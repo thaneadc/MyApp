@@ -45,19 +45,20 @@ jobs:
       - name: Verify v0.19 production bundle
         run: |
           grep -q "v0.19 TEST" dist/index.html
-          grep -q "Missions Hidden" dist/voyage-v014.js
-          grep -q "open?stacks.map" dist/voyage-v014.js
-          grep -q "zoneLocked .missionTile{display:none" dist/voyage-table.css
-          echo "v0.19 locked-zone concealment verified"
+          grep -q "missionCardBack" dist/voyage-v014.js
+          grep -q "dockSelectable" dist/voyage-v014.js
+          grep -q "Choose a glowing Mission card on the board" dist/voyage-v014.js
+          grep -q "dockMissionGlow" dist/voyage-table.css
+          echo "v0.19 dock selection and locked-zone card backs verified"
 
       - name: Commit v0.19 implementation
         run: |
           git config user.name "captains-dash-build-bot"
           git config user.email "actions@users.noreply.github.com"
-          git add voyage-v014.js voyage-table.css index.html menu.js package.json package-lock.json
+          git add voyage-v014.js voyage-table.css package.json package-lock.json
           if git diff --cached --quiet; then
             echo "v0.19 files already up to date"
           else
-            git commit -m "Release v0.19 hide mission cards in locked zones"
+            git commit -m "Finalize v0.19 dock mission selection and locked card backs"
             git push origin HEAD:release/v0.19
           fi
