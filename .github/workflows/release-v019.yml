@@ -6,6 +6,7 @@ on:
       - 'release/v0.19'
     paths:
       - '.github/workflows/release-v019.yml'
+      - 'scripts/release_v019.py'
   workflow_dispatch:
 
 permissions:
