@@ -1,0 +1,87 @@
+name: Build Captain's Dash v0.18
+
+on:
+  push:
+    branches:
+      - 'release/v0.18'
+    paths:
+      - '.github/workflows/release-v018.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build-v018:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout release branch
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Install asset download dependency
+        run: python3 -m pip install --quiet selenium
+
+      - name: Download reference-derived v0.18 assets
+        env:
+          SHARE_URL: https://firestorage.ai/ja/f/f3qInxy8gqqC
+          FILE_NAME: v018-assets.zip
+          EXPECTED_SHA: fdae11f11e0e7d22e6a4944633344034543d1c201819b3087551d45540ccf087
+          MIN_BYTES: 100000
+          OUT: /tmp/v018-assets.zip
+        run: python3 scripts/firestorage_download_generic.py
+
+      - name: Install v0.18 art assets
+        run: |
+          unzip -o /tmp/v018-assets.zip -d /tmp/v018-assets
+          cp /tmp/v018-assets/locations-v018.jpg assets/locations-v018.jpg
+          cp /tmp/v018-assets/resources-v018.jpg assets/resources-v018.jpg
+          test "$(sha256sum assets/locations-v018.jpg | cut -d' ' -f1)" = "4051cef8c3069559789e0e9cdef1905e9e722e047d62276d695f44038929a746"
+          test "$(sha256sum assets/resources-v018.jpg | cut -d' ' -f1)" = "591c9ae62861b13dcb6f89ac0db0b1a702b04c2043d6ce7744135f3a57883ef8"
+
+      - name: Apply v0.18 patch
+        run: python3 scripts/release_v018.py
+
+      - name: Set package version
+        run: npm version 0.18.0 --no-git-tag-version --allow-same-version
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: JavaScript syntax checks
+        run: |
+          node --check menu.js
+          node --check voyage-v014.js
+          node --check voyage-flair.js
+          node --check engine-v014.mjs
+
+      - name: Run rules regression tests
+        run: npm test
+
+      - name: Build release
+        run: npm run build
+
+      - name: Verify v0.18 production bundle
+        run: |
+          test -s dist/assets/locations-v018.jpg
+          test -s dist/assets/resources-v018.jpg
+          grep -q "v0.18 TEST" dist/index.html
+          grep -q "undoWorkerState" dist/voyage-v014.js
+          grep -q "supplyBuyGrid" dist/voyage-v014.js
+          grep -q "zoneSupplyBadge" dist/voyage-v014.js
+          grep -q "locations-v018.jpg" dist/voyage-table.css
+          grep -q "resources-v018.jpg" dist/voyage-table.css
+          echo "v0.18 release bundle verified"
+
+      - name: Commit v0.18 implementation
+        run: |
+          git config user.name "captains-dash-build-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add menu.js voyage-v014.js voyage-flair.js voyage-table.css index.html package.json package-lock.json assets/locations-v018.jpg assets/resources-v018.jpg
+          if git diff --cached --quiet; then
+            echo "v0.18 files already up to date"
+          else
+            git commit -m "Release v0.18 illustrated actions, resource art, zone costs, token undo and visual supply buying"
+            git push origin HEAD:release/v0.18
+          fi
