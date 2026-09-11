@@ -1,0 +1,35 @@
+name: Smoke Test Captain's Dash v0.27 Production
+
+on:
+  push:
+    branches: ['release/v0.27']
+    paths: ['.github/workflows/smoke-v027-production.yml']
+  workflow_dispatch:
+
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Verify production v0.27 fixed original portraits
+        shell: bash
+        run: |
+          set -euo pipefail
+          base='https://captains-dash-the-final-isle.vercel.app'
+          curl -fsSL --retry 8 --retry-delay 3 "$base/" -o /tmp/index.html
+          grep -q 'v0.27 TEST' /tmp/index.html
+          grep -q 'assets/014ea26d527fb00d.jpg' /tmp/index.html
+          grep -q 'assets/724be8a80f197bb0.jpg' /tmp/index.html
+          ! grep -q 'Tap a portrait to change captain' /tmp/index.html
+          curl -fsSL --retry 8 --retry-delay 3 "$base/menu.js" -o /tmp/menu.js
+          grep -q '014ea26d527fb00d.jpg' /tmp/menu.js
+          grep -q '724be8a80f197bb0.jpg' /tmp/menu.js
+          ! grep -q 'randomPortraitSet' /tmp/menu.js
+          ! grep -q 'cyclePortrait(' /tmp/menu.js
+          grep -q 'captains-dash-final-clean-v3.ogg' /tmp/menu.js
+          grep -q 'captains-dash-victory-v2.ogg' /tmp/menu.js
+          curl -fsSL --retry 8 --retry-delay 3 "$base/voyage-v014.js" -o /tmp/voyage.js
+          grep -q 'The Final Isle · v0.27' /tmp/voyage.js
+          grep -q 'p.portrait=portraits\[i\]' /tmp/voyage.js
+          curl -fsSL --retry 8 --retry-delay 3 "$base/assets/014ea26d527fb00d.jpg" -o /tmp/captain.jpg
+          test $(wc -c < /tmp/captain.jpg) -gt 1000
+          echo 'PRODUCTION_V027_OK'
