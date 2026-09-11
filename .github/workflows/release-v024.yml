@@ -1,0 +1,74 @@
+name: Build Captain's Dash v0.24
+
+on:
+  push:
+    branches:
+      - 'release/v0.24'
+    paths:
+      - '.github/workflows/release-v024.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build-v024:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout release branch
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Apply v0.24 patch
+        run: python3 scripts/release_v024.py
+
+      - name: Set package version
+        run: npm version 0.24.0 --no-git-tag-version --allow-same-version
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: JavaScript syntax checks
+        run: |
+          node --check menu.js
+          node --check voyage-v014.js
+          node --check engine-v014.mjs
+
+      - name: Run existing regression tests
+        run: npm test
+
+      - name: Run v0.22 regression tests
+        run: node tests/rules-v022.mjs
+
+      - name: Run v0.23 regression tests
+        run: node tests/rules-v023.mjs
+
+      - name: Run v0.24 regression tests
+        run: node tests/rules-v024.mjs
+
+      - name: Build release
+        run: npm run build
+
+      - name: Verify built v0.24 markers
+        run: |
+          grep -q "v0.24" dist/index.html
+          grep -q "Veteran Crew Market" dist/voyage-v014.js
+          grep -q "spyglassBody" dist/voyage-v014.js
+          grep -q "combatIcon" dist/voyage-v014.js
+          grep -q "blackRefreshBtn" dist/voyage-v014.js
+          grep -q "p.gold-=a.ids.length" dist/engine-v014.mjs
+          grep -q "physicalCard .vStats .testIcon" dist/voyage-table.css
+          echo "v0.24 release build verified"
+
+      - name: Commit v0.24 implementation
+        run: |
+          git config user.name "captains-dash-build-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add engine-v014.mjs voyage-v014.js voyage-table.css menu.js index.html package.json package-lock.json
+          if git diff --cached --quiet; then
+            echo "v0.24 files already up to date"
+          else
+            git commit -m "Release v0.24 pirate icons, paid Black Market and Veteran market phase"
+            git push origin HEAD:release/v0.24
+          fi
