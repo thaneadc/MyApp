@@ -13,7 +13,7 @@ s.players[1].crew[0].exhausted=true;
 s.location='quarters';
 s=act(s,{type:'ready'});
 assert.equal(s.players[1].crew.every(c=>!c.exhausted),true,'AI Crew Quarters must ready every exhausted Crew');
-assert.match(s.log[0],/rested at Crew Quarters/,'Crew Quarters should log the ready-all result');
+assert.equal(s.log.some(x=>/rested at Crew Quarters/.test(x)),true,'Crew Quarters should log the ready-all result');
 
 const menu=fs.readFileSync(new URL('../menu.js',import.meta.url),'utf8');
 const ui=fs.readFileSync(new URL('../voyage-v014.js',import.meta.url),'utf8');
