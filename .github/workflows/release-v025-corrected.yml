@@ -6,6 +6,7 @@ on:
       - 'release/v0.25'
     paths:
       - '.github/workflows/release-v025-corrected.yml'
+      - 'tests/rules-v025.mjs'
 
 permissions:
   contents: write
