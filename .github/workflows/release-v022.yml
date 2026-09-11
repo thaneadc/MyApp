@@ -1,0 +1,79 @@
+name: Build Captain's Dash v0.22
+
+on:
+  push:
+    branches:
+      - 'release/v0.22'
+    paths:
+      - '.github/workflows/release-v022.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build-v022:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout release branch
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Apply v0.22 patch
+        run: python3 scripts/release_v022.py
+
+      - name: Set package version
+        run: npm version 0.22.0 --no-git-tag-version --allow-same-version
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: JavaScript syntax checks
+        run: |
+          node --check menu.js
+          node --check voyage-v014.js
+          node --check engine-v014.mjs
+
+      - name: Run existing regression tests
+        run: npm test
+
+      - name: Run v0.22 rules tests
+        run: node tests/rules-v022.mjs
+
+      - name: Verify D8 RNG implementation
+        shell: bash
+        run: |
+          grep -q "FACES=\['SKULL',0,0,1,1,2,2,'GOLD'\]" engine-v014.mjs
+          grep -q 'rng()\*FACES.length' engine-v014.mjs
+          if grep -q 'rng()\*6' engine-v014.mjs; then
+            echo 'Legacy D6 RNG remains in engine'
+            exit 1
+          fi
+
+      - name: Build release
+        run: npm run build
+
+      - name: Verify built v0.22 markers
+        shell: bash
+        run: |
+          grep -q "v0.22 Test" dist/index.html
+          grep -q "The Final Isle · v0.22" dist/voyage-v014.js
+          grep -q "completedMissionCard" dist/voyage-v014.js
+          grep -q "playerZoneEligible" dist/engine-v014.mjs
+          grep -q "die.d8" dist/voyage-table.css
+          grep -q "sailingIcon" dist/voyage-v014.js
+          grep -q "searchIcon" dist/voyage-v014.js
+          echo "v0.22 release build verified"
+
+      - name: Commit v0.22 implementation
+        run: |
+          git config user.name "captains-dash-build-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add engine-v014.mjs voyage-v014.js voyage-table.css menu.js index.html package.json package-lock.json
+          if git diff --cached --quiet; then
+            echo "v0.22 files already up to date"
+          else
+            git commit -m "Release v0.22 D8, maritime icons and personal mission progression"
+            git push origin HEAD:release/v0.22
+          fi
