@@ -1,0 +1,41 @@
+name: Smoke Test Captain's Dash v0.21 Production
+
+on:
+  push:
+    branches: ['release/v0.21']
+    paths: ['.github/workflows/smoke-production-v021.yml']
+
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Verify production serves v0.21 and both soundtracks
+        shell: bash
+        run: |
+          set -euo pipefail
+          base="https://captains-dash-the-final-isle.vercel.app"
+          ok=0
+          for attempt in $(seq 1 15); do
+            echo "Production smoke attempt $attempt"
+            code=$(curl -L -sS -o /tmp/page.html -w '%{http_code}' --max-time 25 "$base/" || true)
+            if [ "$code" = "200" ] && grep -q "v0.21 Test" /tmp/page.html; then
+              curl -L -fsS --max-time 30 "$base/voyage-v014.js" -o /tmp/voyage.js
+              curl -L -fsS --max-time 30 "$base/menu.js" -o /tmp/menu.js
+              grep -q "The Final Isle · v0.21" /tmp/voyage.js
+              grep -q "expeditionTable" /tmp/voyage.js
+              grep -q "Ready Crew / Total Crew" /tmp/voyage.js
+              grep -q "captains-dash-adventure-v2.ogg" /tmp/menu.js
+              grep -q "captains-dash-adrenaline-v2.ogg" /tmp/menu.js
+              curl -L -fsS --max-time 60 "$base/assets/captains-dash-adventure-v2.ogg" -o /tmp/adventure.ogg
+              curl -L -fsS --max-time 60 "$base/assets/captains-dash-adrenaline-v2.ogg" -o /tmp/adrenaline.ogg
+              test "$(head -c 4 /tmp/adventure.ogg)" = "OggS"
+              test "$(head -c 4 /tmp/adrenaline.ogg)" = "OggS"
+              test $(wc -c < /tmp/adventure.ogg) -gt 1000000
+              test $(wc -c < /tmp/adrenaline.ogg) -gt 900000
+              echo "PRODUCTION_V021_OK HTTP 200"
+              ok=1
+              break
+            fi
+            sleep 5
+          done
+          test "$ok" = "1"
