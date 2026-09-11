@@ -1,0 +1,30 @@
+name: Probe v0.21 Audio Shares
+
+on:
+  push:
+    branches: ['release/v0.21']
+    paths: ['.github/workflows/ingest-v021-audio.yml']
+  workflow_dispatch:
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Probe share pages
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          import urllib.request,re
+          for name,url in [
+            ('adventure','https://firestorage.ai/ja/f/LsoSboH9Quaj'),
+            ('adrenaline','https://firestorage.ai/ja/f/RZaEYAq81iZV')]:
+            print('\n===',name,'===')
+            req=urllib.request.Request(url,headers={'User-Agent':'Mozilla/5.0'})
+            data=urllib.request.urlopen(req,timeout=30).read()
+            print('bytes',len(data),'prefix',data[:120])
+            text=data.decode('utf-8','ignore')
+            for line in text.splitlines():
+              low=line.lower()
+              if any(k in low for k in ['download','\.ogg','file_id','public_id','signed','storage']):
+                print(line[:1500])
+          PY
