@@ -21,7 +21,9 @@ jobs:
           fetch-depth: 0
 
       - name: Apply v0.25 patch
-        run: python3 scripts/release_v025.py
+        run: |
+          python3 scripts/release_v025.py
+          python3 scripts/fix_v025_syntax.py
 
       - name: Set package version
         run: npm version 0.25.0 --no-git-tag-version --allow-same-version
