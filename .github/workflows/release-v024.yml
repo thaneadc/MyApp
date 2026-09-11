@@ -6,6 +6,9 @@ on:
       - 'release/v0.24'
     paths:
       - '.github/workflows/release-v024.yml'
+      - 'scripts/release_v024.py'
+      - 'tests/rules-v023.mjs'
+      - 'tests/rules-v024.mjs'
   workflow_dispatch:
 
 permissions:
@@ -54,6 +57,7 @@ jobs:
         run: |
           grep -q "v0.24" dist/index.html
           grep -q "Veteran Crew Market" dist/voyage-v014.js
+          grep -q "state.veteranMarket:state.market" dist/voyage-v014.js
           grep -q "spyglassBody" dist/voyage-v014.js
           grep -q "combatIcon" dist/voyage-v014.js
           grep -q "blackRefreshBtn" dist/voyage-v014.js
