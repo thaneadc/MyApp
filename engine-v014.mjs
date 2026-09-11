@@ -2,7 +2,7 @@ import {DATA} from './cards-v014.js';
 export {DATA};
 export const CARDS=Object.fromEntries(DATA.cards.map(c=>[c.id,c]));
 export const SAVE_KEY='captainsDashRules015';
-export const FACES=['SKULL',0,0,1,2,'GOLD'];
+export const FACES=['SKULL',0,0,1,1,2,2,'GOLD'];
 export const LOCATIONS={tavern:'Tavern',market:'Market',dock:'Dock',work:'Harbor Work',quarters:'Crew Quarters',black:'Black Market',veteran:"Veteran’s Den",witch:'Sea Witch'};
 const must=(v,m)=>{if(!v)throw Error(m)};
 export const current=s=>s.players[s.turn];
@@ -20,7 +20,10 @@ const instance=(s,id)=>({id,uid:'crew-'+s.nextId++,exhausted:false});
 export function unlocked(s,z){return z===1||(z===2&&s.players.length===2)||s.progress[z-2]>=[2,2,1][z-2]}
 export function locationOpen(s,l){return l==='black'?s.progress[1]>=1:l==='veteran'?s.progress[1]>=2:l==='witch'?unlocked(s,4):Object.hasOwn(LOCATIONS,l)}
 export function legalWorker(s,l){return !s.location&&!s.exp&&!s.overflow&&locationOpen(s,l)&&(s.phase==='place'?s.workers[l]===null:s.workers[l]!==null&&l!==s.placed)}
-export function available(s,id){const c=CARDS[id];return !!c&&(c.kind==='final'?unlocked(s,4)&&s.final[0]===id:c.zone&&unlocked(s,c.zone)&&s.stacks[c.zone].some(st=>st[0]===id))}
+export function playerCompletedMissions(s,playerIndex=s.turn){const p=s.players[playerIndex];if(!p)return [];return s.missionDiscard.filter(m=>m.result==='success'&&(m.playerIndex===playerIndex||(m.playerIndex==null&&m.player===p.name))).map(m=>m.id)}
+export function zoneHasMission(s,z){return z===4?!!s.final?.length:(s.stacks?.[z]||[]).some(st=>st?.length)}
+export function playerZoneEligible(s,z,playerIndex=s.turn){if(z<=1)return true;const prev=z-1;if(!zoneHasMission(s,prev))return true;return playerCompletedMissions(s,playerIndex).some(id=>CARDS[id]?.zone===prev)}
+export function available(s,id){const c=CARDS[id];if(!c)return false;const z=c.kind==='final'?4:c.zone;if(!z||!unlocked(s,z)||!playerZoneEligible(s,z))return false;return c.kind==='final'?s.final[0]===id:s.stacks[c.zone].some(st=>st[0]===id)}
 export function newGame(setup={},rng=Math.random){
  const s={version:'0.15',nextId:1,turn:0,round:1,status:'playing',mode:setup.mode||'local',phase:'place',placed:null,location:null,workers:Object.fromEntries(Object.keys(LOCATIONS).map(l=>[l,["tavern","dock"].includes(l)?true:null])),progress:[0,0,0],stacks:{},final:[],missionDiscard:[],treasureDiscard:[],crewDiscard:[],log:[],exp:null,overflow:null,blackRefreshed:false};
  s.players=Array.from({length:Math.max(2,Math.min(4,setup.players||2))},(_,i)=>({name:setup.names?.[i]||'Player '+(i+1),gold:i?3:2,supply:i>=2?3:2,crew:[instance(s,'C01')],treasures:[],blessing:null}));
@@ -51,8 +54,8 @@ function resolveOutcome(s,rng){const p=current(s),e=s.exp,c=CARDS[e.mission],t=t
  if(count(p,e,'C14')){const x=p.crew.find(c=>c.exhausted);if(x)x.exhausted=false}
  for(const [key,deck] of [['crew','crewDeck'],['veteran','veteranDeck']])for(let i=0;i<(r[key]||0);i++){const id=s[deck].shift();if(id)p.crew.push(instance(s,id))}
  for(let i=0;i<(r.treasure||0);i++)e.queue.push(count(p,e,'C09')?2:1);if(r.drawTreasure)e.queue.push(2);
- s.stacks[c.zone].find(st=>st[0]===c.id).shift();s.progress[c.zone-1]++;s.missionDiscard.unshift({id:c.id,player:p.name,result:'success'});
- }else{if(!e.dice.includes('SKULL')){if(has(e,'T03'))p.supply++;if(has(e,'T15'))p.gold+=2}if(has(e,'T20'))p.gold=Math.max(0,p.gold-1);if(c.kind==='final'&&s.final.length>1){s.final.shift();s.missionDiscard.unshift({id:c.id,player:p.name,result:'failed'})}}
+ s.stacks[c.zone].find(st=>st[0]===c.id).shift();s.progress[c.zone-1]++;s.missionDiscard.unshift({id:c.id,player:p.name,playerIndex:s.turn,result:'success'});
+ }else{if(!e.dice.includes('SKULL')){if(has(e,'T03'))p.supply++;if(has(e,'T15'))p.gold+=2}if(has(e,'T20'))p.gold=Math.max(0,p.gold-1);if(c.kind==='final'&&s.final.length>1){s.final.shift();s.missionDiscard.unshift({id:c.id,player:p.name,playerIndex:s.turn,result:'failed'})}}
  log(s,`${p.name}: ${c.name} — ${e.success?'SUCCESS':'FAIL'} (${e.total} ${t})`);nextReward(s,rng);
 }
 function checkResult(s,rng){const p=current(s),e=s.exp;e.total=totalScore(p,e);e.success=!e.dice.includes('SKULL')&&e.total>=testInfo(e).target;if(e.success&&CARDS[e.mission].kind==='final'&&e.step===0){log(s,p.name+' passed Final Step 1');e.firstDice=[...e.dice];e.step=1;e.phase='ready';e.dice=[];e.used=[];e.awarded={};e.success=null;return}if(!e.success){e.phase='loss';return}resolveOutcome(s,rng)}
@@ -62,8 +65,8 @@ export function act(original,a,rng=Math.random){const s=normalizeSharedPools(str
  if(s.overflow){must(a.type==='discardOwned','Choose a card to discard first');if(s.overflow==='crew')discardCrew(s,p,a.id);else{must(p.treasures.includes(a.id),'Choose owned Treasure');p.treasures.splice(p.treasures.indexOf(a.id),1);s.treasureDiscard.push(a.id)}if(!checkCapacity(s)){if(e)nextReward(s,rng);else endAction(s)}return s}
  if(a.type==='worker'){must(legalWorker(s,a.location),'Choose a legal location: take a shared Pirate from another location, never the just-placed Pirate');s.location=a.location;if(s.phase==='place'){s.workers[a.location]=true;s.placed=a.location}else s.workers[a.location]=null;return s}
  if(e){
- if(a.type==='roll'){must(e.phase==='ready','Already rolled');e.dice=Array.from({length:CARDS[e.mission].zone||3},()=>FACES[Math.floor(rng()*6)]);awardDice(p,e,e.dice);e.phase='dice';if(e.dice.includes('SKULL'))checkResult(s,rng);return s}
- if(a.type==='control'){must(controls(s).some(o=>o.id===a.id),'Ability unavailable');if(a.id==='T14'){e.dice[e.dice.indexOf(0)]=1;e.used.push(a.id)}else{const index=a.id==='fortune'?a.index:e.dice.indexOf(0);must(Number.isInteger(index)&&index>=0&&index<e.dice.length&&e.dice[index]!=='SKULL','Choose a non-Skull die');if(a.id==='fortune')e.fortuneUsed=true;else e.used.push(a.id);const face=FACES[Math.floor(rng()*6)];e.dice[index]=face;awardDice(p,e,[face]);if(face==='SKULL')checkResult(s,rng)}return s}
+ if(a.type==='roll'){must(e.phase==='ready','Already rolled');e.dice=Array.from({length:CARDS[e.mission].zone||3},()=>FACES[Math.floor(rng()*FACES.length)]);awardDice(p,e,e.dice);e.phase='dice';if(e.dice.includes('SKULL'))checkResult(s,rng);return s}
+ if(a.type==='control'){must(controls(s).some(o=>o.id===a.id),'Ability unavailable');if(a.id==='T14'){e.dice[e.dice.indexOf(0)]=1;e.used.push(a.id)}else{const index=a.id==='fortune'?a.index:e.dice.indexOf(0);must(Number.isInteger(index)&&index>=0&&index<e.dice.length&&e.dice[index]!=='SKULL','Choose a non-Skull die');if(a.id==='fortune')e.fortuneUsed=true;else e.used.push(a.id);const face=FACES[Math.floor(rng()*FACES.length)];e.dice[index]=face;awardDice(p,e,[face]);if(face==='SKULL')checkResult(s,rng)}return s}
  if(a.type==='resolve'){must(e.phase==='dice','Roll first');checkResult(s,rng);return s}
  if(a.type==='loss'){must(e.phase==='loss','No Crew loss pending');if(a.prevent==='surgeon'){must(count(p,e,'C12')&&!e.surgeonUsed,'Surgeon unavailable');e.surgeonUsed=true}else if(a.prevent==='medallion'){must(has(e,'T19'),'Medallion unavailable');p.treasures=p.treasures.filter(id=>id!=='T19');e.treasures=e.treasures.filter(id=>id!=='T19');s.treasureDiscard.push('T19')}else{const crew=selected(p,e),b=crew.find(c=>c.id==='C10');must(crew.some(c=>c.uid===a.id)&&(!b||b.uid===a.id),'Berserker must be lost first');discardCrew(s,p,a.id)}resolveOutcome(s,rng);return s}
  if(a.type==='keepTreasure'){must(e.phase==='treasure'&&e.choices.includes(a.id),'Select a drawn Treasure');p.treasures.push(a.id);s.treasureDiscard.push(...e.choices.filter(id=>id!==a.id));e.choices=[];nextReward(s,rng);return s}
