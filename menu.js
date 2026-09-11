@@ -6,14 +6,8 @@
   const panels=[...document.querySelectorAll(".panel")];
   const menuButtons=[...document.querySelectorAll(".menuBtn")];
   const captainNames=["Captain Anne","Captain Black","Captain Morgan","Captain Silver"];
-  const portraitOptions=Array.from({length:10},(_,i)=>`captain-v026-${String(i+1).padStart(2,"0")}.svg`);
-  const defaultPortraits=portraitOptions.slice(0,4);
-  const randomPortraitSet=()=>{
-    const a=[...portraitOptions];
-    for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}
-    return a.slice(0,4);
-  };
-  let selectedPortraits=randomPortraitSet();
+  const defaultPortraits=["014ea26d527fb00d.jpg","5d6137ac745946c3.jpg","c70de609c89d8c4c.jpg","724be8a80f197bb0.jpg"];
+  let selectedPortraits=[...defaultPortraits];
   const colors=["#c9302c","#1f76b4","#21924a","#d7aa1d"];
   const seaNames=["Anne","Black","Morgan","Silver","Flint","Rackham","Bonny","Vane","Drake","Kidd","Read","Bellamy"];
   const aiNames=["AI Blackbeard","AI Morgan","AI Silver"];
@@ -77,7 +71,7 @@
     const b=document.querySelector(`[data-panel="${name}"]`); if(b) b.classList.add("active");
     clickSfx(360);
   }
-  document.querySelectorAll("[data-panel]").forEach(b=>b.addEventListener("click",()=>{if(b.dataset.panel==="setup")randomizePortraits();openPanel(b.dataset.panel)}));
+  document.querySelectorAll("[data-panel]").forEach(b=>b.addEventListener("click",()=>openPanel(b.dataset.panel)));
   document.querySelectorAll("[data-close]").forEach(b=>b.addEventListener("click",()=>{closePanels();clickSfx(290)}));
 
   function renderNames(values) {
@@ -92,46 +86,18 @@
   function renderCaptainPortraits() {
     document.querySelectorAll(".captain").forEach((c,i)=>{
       const img=c.querySelector("img");
-      if(img)img.src=`assets/${selectedPortraits[i]||defaultPortraits[i]}`;
-      c.dataset.portrait=selectedPortraits[i]||defaultPortraits[i];
-      c.setAttribute("aria-label",`${captainNames[i]} portrait. Tap to change portrait.`);
-      c.tabIndex=i<count?0:-1;
+      const portrait=defaultPortraits[i]||defaultPortraits[0];
+      if(img)img.src=`assets/${portrait}`;
+      c.dataset.portrait=portrait;
+      c.setAttribute("aria-label",`${captainNames[i]} portrait`);
+      c.removeAttribute("role");
+      c.tabIndex=-1;
     });
   }
-  function normalizePortraits(values) {
-    const wanted=Array.isArray(values)?values:[];
-    const used=new Set(),out=[];
-    for(let i=0;i<4;i++){
-      const candidate=wanted[i];
-      if(portraitOptions.includes(candidate)&&!used.has(candidate)){out[i]=candidate;used.add(candidate);continue}
-      const fallback=portraitOptions.find(x=>!used.has(x));out[i]=fallback;used.add(fallback);
-    }
-    return out;
-  }
-  function randomizePortraits() {
-    selectedPortraits=randomPortraitSet();
+  function applyPortraits() {
+    selectedPortraits=[...defaultPortraits];
     renderCaptainPortraits();
   }
-  function applyPortraits(values) {
-    selectedPortraits=normalizePortraits(values);
-    renderCaptainPortraits();
-  }
-  function cyclePortrait(i,dir=1) {
-    if(i>=count)return;
-    const used=new Set(selectedPortraits.filter((_,j)=>j!==i));
-    const current=Math.max(0,portraitOptions.indexOf(selectedPortraits[i]));
-    for(let step=1;step<=portraitOptions.length;step++){
-      const idx=(current+dir*step+portraitOptions.length*4)%portraitOptions.length;
-      if(!used.has(portraitOptions[idx])){selectedPortraits[i]=portraitOptions[idx];break}
-    }
-    renderCaptainPortraits();
-    clickSfx(560,.06);
-  }
-  document.querySelectorAll(".captain").forEach((c,i)=>{
-    c.setAttribute("role","button");
-    c.addEventListener("click",()=>cyclePortrait(i,1));
-    c.addEventListener("keydown",e=>{if((e.key==="Enter"||e.key===" ")&&i<count){e.preventDefault();cyclePortrait(i,e.shiftKey?-1:1)}});
-  });
 
   function syncModeNames() {
     const ins=[...document.querySelectorAll("#names input")];
@@ -166,7 +132,7 @@
 
   function currentSetup() {
     return {
-      version:"0.26",
+      version:"0.27",
       players:count,
       names:[...document.querySelectorAll("#names input")].map(x=>x.value.trim()||"Captain"),
       captains:captainNames.slice(0,count),
@@ -191,7 +157,7 @@
   document.getElementById("continueBtn").addEventListener("click",()=>{
     try {
       const full=JSON.parse(localStorage.getItem("captainsDashRules015")||"null");
-      if(full&&full.players?.length){const sv={players:full.players.length,names:full.players.map(p=>p.name),captains:full.players.map(p=>p.captain),portraits:full.players.map((p,i)=>p.portrait||defaultPortraits[i]),mode:full.mode||"local",updatedAt:Date.now()};applyPortraits(sv.portraits);setCount(sv.players,sv.names);gameMode=sv.mode;document.getElementById("voyageSummary").textContent=`${sv.players} Captains · Saved Full Game`;document.getElementById("roster").innerHTML=sv.names.map((n,i)=>`<span>${sv.captains[i]} — ${esc(n)}</span>`).join("");document.getElementById("transition").classList.add("show");window.dispatchEvent(new CustomEvent("captainsdash:startgame",{detail:{...sv,resume:true}}));return;}
+      if(full&&full.players?.length){const sv={players:full.players.length,names:full.players.map(p=>p.name),captains:full.players.map(p=>p.captain),portraits:defaultPortraits.slice(0,full.players.length),mode:full.mode||"local",updatedAt:Date.now()};applyPortraits(sv.portraits);setCount(sv.players,sv.names);gameMode=sv.mode;document.getElementById("voyageSummary").textContent=`${sv.players} Captains · Saved Full Game`;document.getElementById("roster").innerHTML=sv.names.map((n,i)=>`<span>${sv.captains[i]} — ${esc(n)}</span>`).join("");document.getElementById("transition").classList.add("show");window.dispatchEvent(new CustomEvent("captainsdash:startgame",{detail:{...sv,resume:true}}));return;}
       const st=JSON.parse(localStorage.getItem("captainsDashSetup")||"null");if(!st)return;applyPortraits(st.portraits);setCount(Math.max(2,Math.min(4,st.players||2)),st.names);gameMode=st.mode||"local";openPanel("setup");toast("Saved voyage restored.");
     } catch(e){toast("Could not restore the saved game.")}
   });
