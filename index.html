@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#071419">
-<title>Captain's Dash: The Final Isle — v0.24 Test</title>
+<title>Captain's Dash: The Final Isle — v0.25 Test</title>
 <style>
 :root {
   --gold:#e7bd58; --gold2:#ffdf83; --ink:#f7edd7; --muted:#cbbda2;
@@ -88,7 +88,7 @@ button{-webkit-tap-highlight-color:transparent}
 .captain{position:relative;border:2px solid #795b3e;border-radius:10px;background:#221b16;overflow:hidden;color:white;padding:0;min-height:142px;cursor:default;transition:.15s}
 .captain.active{border-color:var(--gold);box-shadow:0 0 0 2px #f0c75f35}
 .captain.inactive{filter:grayscale(.85) brightness(.58);opacity:.65}
-.captain img{width:100%;height:96px;object-fit:cover;display:block}
+.captain img{width:100%;height:96px;object-fit:cover;display:block}.captain:not(.inactive){cursor:pointer}.captain:not(.inactive):hover img,.captain:not(.inactive):focus img{filter:brightness(1.12);transform:scale(1.025)}.captain img{transition:filter .16s,transform .16s}.captain:focus{outline:2px solid #f4c866;outline-offset:2px}.captain:after{content:"↻";position:absolute;right:5px;top:5px;width:24px;height:24px;border-radius:50%;display:grid;place-items:center;background:#071820cc;color:#f4cf79;border:1px solid #e0b85c;font:700 16px system-ui}.captain.inactive:after{display:none}.captainTitle{display:flex;align-items:baseline;justify-content:space-between;gap:12px}.captainTitle small{font:11px system-ui;color:#725b40;font-weight:500}
 .captain span{display:block;font-size:12px;padding:6px 2px;text-align:center}
 .names{display:grid;gap:7px;margin-top:9px}
 .nameRow{display:grid;grid-template-columns:28px 1fr;align-items:center;gap:8px}
@@ -259,7 +259,7 @@ body{min-height:100dvh}
   <div class="birds"><i class="bird b1"></i><i class="bird b2"></i><i class="bird b3"></i></div>
 
   <header class="topbar">
-    <div class="version">CAPTAIN'S DASH · FULL GAME · v0.24 TEST</div>
+    <div class="version">CAPTAIN'S DASH · FULL GAME · v0.25 TEST</div>
     <div class="quick">
       <button id="musicBtn" type="button" aria-label="Toggle music" title="Music">♫</button>
       <button id="sfxBtn" type="button" aria-label="Toggle sound effects" title="Sound effects">🔊</button>
@@ -299,7 +299,7 @@ body{min-height:100dvh}
             </div>
           </div>
           <div class="section">
-            <div class="sectionTitle">Captains</div>
+            <div class="sectionTitle captainTitle">Captains <small>Tap a portrait to change captain</small></div>
             <div class="captains">
               <div class="captain active" data-cap="0"><img alt="Captain Anne" src="assets/014ea26d527fb00d.jpg"><span>Captain Anne</span></div>
               <div class="captain active" data-cap="1"><img alt="Captain Black" src="assets/5d6137ac745946c3.jpg"><span>Captain Black</span></div>
@@ -345,7 +345,7 @@ body{min-height:100dvh}
         <div class="panelHeader"><div><h2>☠ Credits</h2><p>The crew behind Captain's Dash.</p></div><button class="close" data-close type="button">×</button></div>
         <div class="panelBody rules">
           <h3>Game</h3><p><b>Captain's Dash: The Final Isle</b><br>Competitive pirate adventure for 2–4 players.</p>
-          <h3>Game Design</h3><p>Designed by Thanead Chiawchanlikit</p><p>Interactive Web Edition · v0.24 Test.</p>
+          <h3>Game Design</h3><p>Designed by Thanead Chiawchanlikit</p><p>Interactive Web Edition · v0.25 Test.</p>
           <h3>Art Direction</h3><p>Cinematic tropical pirate adventure, parchment-and-wood interface, readable board-game presentation.</p>
           <p style="margin-top:24px;font-style:italic">“More than a game. A journey.”</p>
         </div>
