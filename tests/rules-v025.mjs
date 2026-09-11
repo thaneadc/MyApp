@@ -2,11 +2,11 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import {newGame,act} from '../engine-v014.mjs';
 
-const setup={players:3,mode:'ai',portraits:['captain-alt-01.svg','captain-alt-02.svg','captain-alt-03.svg']};
+const setup={players:3,mode:'ai',portraits:['captain-v026-01.svg','captain-v026-02.svg','captain-v026-03.svg']};
 let s=newGame(setup,()=>0.31);
-assert.equal(s.players[0].portrait,'captain-alt-01.svg');
-assert.equal(s.players[1].portrait,'captain-alt-02.svg');
-assert.equal(s.players[2].portrait,'captain-alt-03.svg');
+assert.equal(s.players[0].portrait,'captain-v026-01.svg');
+assert.equal(s.players[1].portrait,'captain-v026-02.svg');
+assert.equal(s.players[2].portrait,'captain-v026-03.svg');
 
 s.turn=1;
 s.players[1].crew[0].exhausted=true;
@@ -18,7 +18,7 @@ assert.equal(s.log.some(x=>/rested at Crew Quarters/.test(x)),true,'Crew Quarter
 const menu=fs.readFileSync(new URL('../menu.js',import.meta.url),'utf8');
 const ui=fs.readFileSync(new URL('../voyage-v014.js',import.meta.url),'utf8');
 const html=fs.readFileSync(new URL('../index.html',import.meta.url),'utf8');
-for(let i=1;i<=6;i++) assert.match(menu,new RegExp(`captain-alt-0${i}\\.svg`));
+assert.match(menu,/portraitOptions/);
 assert.match(menu,/portraits:selectedPortraits\.slice\(0,count\)/);
 assert.match(menu,/cyclePortrait/);
 assert.match(ui,/portraitFor=/);

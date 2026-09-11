@@ -6,9 +6,14 @@
   const panels=[...document.querySelectorAll(".panel")];
   const menuButtons=[...document.querySelectorAll(".menuBtn")];
   const captainNames=["Captain Anne","Captain Black","Captain Morgan","Captain Silver"];
-  const defaultPortraits=["014ea26d527fb00d.jpg","5d6137ac745946c3.jpg","c70de609c89d8c4c.jpg","724be8a80f197bb0.jpg"];
-  const portraitOptions=[...defaultPortraits,"captain-alt-01.svg","captain-alt-02.svg","captain-alt-03.svg","captain-alt-04.svg","captain-alt-05.svg","captain-alt-06.svg"];
-  let selectedPortraits=[...defaultPortraits];
+  const portraitOptions=Array.from({length:10},(_,i)=>`captain-v026-${String(i+1).padStart(2,"0")}.svg`);
+  const defaultPortraits=portraitOptions.slice(0,4);
+  const randomPortraitSet=()=>{
+    const a=[...portraitOptions];
+    for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}
+    return a.slice(0,4);
+  };
+  let selectedPortraits=randomPortraitSet();
   const colors=["#c9302c","#1f76b4","#21924a","#d7aa1d"];
   const seaNames=["Anne","Black","Morgan","Silver","Flint","Rackham","Bonny","Vane","Drake","Kidd","Read","Bellamy"];
   const aiNames=["AI Blackbeard","AI Morgan","AI Silver"];
@@ -30,7 +35,7 @@
       o.connect(g); g.connect(audioCtx.destination); o.start(); g.gain.exponentialRampToValueAtTime(.0001,audioCtx.currentTime+dur); o.stop(audioCtx.currentTime+dur);
     } catch(e) {}
   }
-  const MUSIC_TRACKS={adventure:'assets/captains-dash-adventure-v2.ogg',adrenaline:'assets/captains-dash-adrenaline-v2.ogg'};
+  const MUSIC_TRACKS={adventure:'assets/captains-dash-adventure-v2.ogg',final:'assets/captains-dash-final-clean-v3.ogg',victory:'assets/captains-dash-victory-v2.ogg'};
   const soundtrack=new Audio();
   soundtrack.id='pirateMusic';
   soundtrack.loop=true;
@@ -39,13 +44,13 @@
   document.body.appendChild(soundtrack);
   let musicStarted=false,musicMode='adventure';
   function setMusicMode(mode='adventure') {
-    mode=mode==='adrenaline'?'adrenaline':'adventure';
+    mode=['adventure','final','victory'].includes(mode)?mode:'adventure';
     if(mode===musicMode&&soundtrack.src.includes(MUSIC_TRACKS[mode]))return;
     const shouldPlay=musicEnabled&&settings.music>0&&(musicStarted||!soundtrack.paused);
     musicMode=mode;
     soundtrack.pause();
     soundtrack.src=MUSIC_TRACKS[mode];
-    soundtrack.loop=true;
+    soundtrack.loop=mode!=='victory';
     soundtrack.currentTime=0;
     soundtrack.volume=Math.max(0,Math.min(1,settings.music/100));
     if(shouldPlay){musicStarted=true;soundtrack.play().catch(()=>{});}
@@ -72,7 +77,7 @@
     const b=document.querySelector(`[data-panel="${name}"]`); if(b) b.classList.add("active");
     clickSfx(360);
   }
-  document.querySelectorAll("[data-panel]").forEach(b=>b.addEventListener("click",()=>openPanel(b.dataset.panel)));
+  document.querySelectorAll("[data-panel]").forEach(b=>b.addEventListener("click",()=>{if(b.dataset.panel==="setup")randomizePortraits();openPanel(b.dataset.panel)}));
   document.querySelectorAll("[data-close]").forEach(b=>b.addEventListener("click",()=>{closePanels();clickSfx(290)}));
 
   function renderNames(values) {
@@ -93,14 +98,32 @@
       c.tabIndex=i<count?0:-1;
     });
   }
+  function normalizePortraits(values) {
+    const wanted=Array.isArray(values)?values:[];
+    const used=new Set(),out=[];
+    for(let i=0;i<4;i++){
+      const candidate=wanted[i];
+      if(portraitOptions.includes(candidate)&&!used.has(candidate)){out[i]=candidate;used.add(candidate);continue}
+      const fallback=portraitOptions.find(x=>!used.has(x));out[i]=fallback;used.add(fallback);
+    }
+    return out;
+  }
+  function randomizePortraits() {
+    selectedPortraits=randomPortraitSet();
+    renderCaptainPortraits();
+  }
   function applyPortraits(values) {
-    if(Array.isArray(values))for(let i=0;i<4;i++)if(values[i]&&portraitOptions.includes(values[i]))selectedPortraits[i]=values[i];
+    selectedPortraits=normalizePortraits(values);
     renderCaptainPortraits();
   }
   function cyclePortrait(i,dir=1) {
     if(i>=count)return;
-    const current=portraitOptions.indexOf(selectedPortraits[i]);
-    selectedPortraits[i]=portraitOptions[(Math.max(0,current)+dir+portraitOptions.length)%portraitOptions.length];
+    const used=new Set(selectedPortraits.filter((_,j)=>j!==i));
+    const current=Math.max(0,portraitOptions.indexOf(selectedPortraits[i]));
+    for(let step=1;step<=portraitOptions.length;step++){
+      const idx=(current+dir*step+portraitOptions.length*4)%portraitOptions.length;
+      if(!used.has(portraitOptions[idx])){selectedPortraits[i]=portraitOptions[idx];break}
+    }
     renderCaptainPortraits();
     clickSfx(560,.06);
   }
@@ -143,7 +166,7 @@
 
   function currentSetup() {
     return {
-      version:"0.25",
+      version:"0.26",
       players:count,
       names:[...document.querySelectorAll("#names input")].map(x=>x.value.trim()||"Captain"),
       captains:captainNames.slice(0,count),
