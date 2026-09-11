@@ -1,0 +1,81 @@
+name: Build Captain's Dash v0.20
+
+on:
+  push:
+    branches:
+      - 'release/v0.20'
+    paths:
+      - '.github/workflows/release-v020.yml'
+      - 'scripts/release_v020.py'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build-v020:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout release branch
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Apply v0.20 patch
+        run: python3 scripts/release_v020.py
+
+      - name: Set package version
+        run: npm version 0.20.0 --no-git-tag-version --allow-same-version
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: JavaScript syntax checks
+        run: |
+          node --check menu.js
+          node --check voyage-v014.js
+          node --check engine-v014.mjs
+
+      - name: Run rules regression tests
+        run: npm test
+
+      - name: Verify shared central market invariant
+        run: |
+          node --input-type=module <<'NODE'
+          import {newGame,act,normalizeSharedPools} from './engine-v014.mjs';
+          const rng=()=>0.17;
+          let s=newGame({players:3,names:['A','B','C']},rng);
+          const initial=[...s.market];
+          if(!Array.isArray(s.market)||s.market.length!==3) throw new Error('shared market not initialized');
+          for(const p of s.players){ if('market' in p||'veteranMarket' in p||'treasureDeck' in p) throw new Error('player-local central pool detected'); }
+          const copy=structuredClone(s); copy.players[0].market=['BAD']; normalizeSharedPools(copy);
+          if('market' in copy.players[0]) throw new Error('legacy player market not removed');
+          if(copy.market.join('|')!==initial.join('|')) throw new Error('canonical shared market changed');
+          console.log('shared central pools verified:', s.market.join(','));
+          NODE
+
+      - name: Build release
+        run: npm run build
+
+      - name: Verify v0.20 production bundle
+        run: |
+          grep -q "v0.20 TEST" dist/index.html
+          grep -q "missionTestBox" dist/voyage-v014.js
+          grep -q "rewardBadges" dist/voyage-v014.js
+          grep -q "crewGroupIcon" dist/voyage-v014.js
+          grep -q "sharedBadge" dist/voyage-v014.js
+          grep -q "normalizeSharedPools" dist/engine-v014.mjs
+          grep -q "rewardIcons" dist/voyage-table.css
+          echo "v0.20 bundle verified"
+
+      - name: Commit v0.20 implementation
+        run: |
+          git config user.name "captains-dash-build-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add engine-v014.mjs voyage-v014.js voyage-table.css index.html menu.js package.json package-lock.json
+          if git diff --cached --quiet; then
+            echo "v0.20 files already up to date"
+          else
+            git commit -m "Release v0.20 shared central pools and mission card polish"
+            git push origin HEAD:release/v0.20
+          fi
