@@ -1,4 +1,4 @@
-name: Probe v0.21 Audio Shares
+name: Ingest v0.21 Audio
 
 on:
   push:
@@ -6,30 +6,60 @@ on:
     paths: ['.github/workflows/ingest-v021-audio.yml']
   workflow_dispatch:
 
+permissions:
+  contents: write
+
 jobs:
-  probe:
+  ingest:
     runs-on: ubuntu-latest
     steps:
-      - name: Probe download client
+      - name: Checkout release branch
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Download original uploaded soundtracks
         shell: bash
         run: |
+          set -euo pipefail
+          mkdir -p assets
           python3 - <<'PY'
-          import urllib.request,re
-          base='https://firestorage.ai/_next/static/chunks/'
-          chunks=['4899-d89df949f2dbd5af.js','8441-REPLACE.js','8500-f4d7bfbe7500f274.js','8437-d65cc193dc908afa.js','5841-1160578ba9bb4f3e.js']
-          for chunk in chunks:
-            if 'REPLACE' in chunk: continue
-            try:
-              req=urllib.request.Request(base+chunk,headers={'User-Agent':'Mozilla/5.0'})
-              text=urllib.request.urlopen(req,timeout=30).read().decode('utf-8','ignore')
-            except Exception as e:
-              print('ERR',chunk,e); continue
-            print('\n===',chunk,'bytes',len(text),'===')
-            for key in ['/api/','download','presign','signed','publicId','shareId','fileId','storage','fetch(']:
-              start=0; shown=0
-              while shown<8:
-                pos=text.lower().find(key.lower(),start)
-                if pos<0: break
-                print('CTX',key,text[max(0,pos-350):pos+900])
-                start=pos+len(key); shown+=1
+          import json, urllib.request, pathlib
+          API='https://api.firestorage.ai/dev/file'
+          jobs=[
+            ('LsoSboH9Quaj','assets/captains-dash-adventure-v2.ogg'),
+            ('RZaEYAq81iZV','assets/captains-dash-adrenaline-v2.ogg'),
+          ]
+          for share,out in jobs:
+              req=urllib.request.Request(f'{API}/shares/{share}/files?maxResults=1000',headers={'User-Agent':'Mozilla/5.0'})
+              with urllib.request.urlopen(req,timeout=30) as r:
+                  meta=json.load(r)
+              files=meta.get('files') or []
+              if not files:
+                  raise SystemExit(f'No files found in share {share}')
+              fid=files[0]['fileId']
+              req=urllib.request.Request(f'{API}/shares/{share}/files/{fid}/download',method='POST',headers={'User-Agent':'Mozilla/5.0'})
+              with urllib.request.urlopen(req,timeout=30) as r:
+                  dl=json.load(r)['downloadUrl']
+              req=urllib.request.Request(dl,headers={'User-Agent':'Mozilla/5.0'})
+              data=urllib.request.urlopen(req,timeout=120).read()
+              if not data.startswith(b'OggS'):
+                  raise SystemExit(f'{out} is not OGG audio')
+              pathlib.Path(out).write_bytes(data)
+              print(out,len(data),files[0].get('fileName'))
           PY
+          test $(wc -c < assets/captains-dash-adventure-v2.ogg) -gt 1000000
+          test $(wc -c < assets/captains-dash-adrenaline-v2.ogg) -gt 900000
+
+      - name: Commit soundtrack assets
+        shell: bash
+        run: |
+          git config user.name "captains-dash-build-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add assets/captains-dash-adventure-v2.ogg assets/captains-dash-adrenaline-v2.ogg
+          if git diff --cached --quiet; then
+            echo "Audio assets already present"
+          else
+            git commit -m "Add Adventure v2 and Final Mission Adrenaline v2 soundtracks"
+            git push origin HEAD:release/v0.21
+          fi
