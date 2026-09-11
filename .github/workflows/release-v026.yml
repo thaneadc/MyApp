@@ -1,0 +1,110 @@
+name: Build Captain's Dash v0.26
+
+on:
+  push:
+    branches:
+      - 'release/v0.26'
+    paths:
+      - '.github/workflows/release-v026.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build-v026:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout release branch
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Download uploaded v0.26 soundtracks
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p assets
+          python3 - <<'PY'
+          import json, urllib.request, pathlib
+          API='https://api.firestorage.ai/dev/file'
+          jobs=[
+            ('E3TaRXrjUAx4','assets/captains-dash-final-clean-v3.ogg'),
+            ('4ZRgfonrB2VL','assets/captains-dash-victory-v2.ogg'),
+          ]
+          for share,out in jobs:
+              req=urllib.request.Request(f'{API}/shares/{share}/files?maxResults=1000',headers={'User-Agent':'Mozilla/5.0'})
+              with urllib.request.urlopen(req,timeout=30) as r:
+                  meta=json.load(r)
+              files=meta.get('files') or []
+              if not files:
+                  raise SystemExit(f'No files found in share {share}')
+              fid=files[0]['fileId']
+              req=urllib.request.Request(f'{API}/shares/{share}/files/{fid}/download',method='POST',headers={'User-Agent':'Mozilla/5.0'})
+              with urllib.request.urlopen(req,timeout=30) as r:
+                  dl=json.load(r)['downloadUrl']
+              req=urllib.request.Request(dl,headers={'User-Agent':'Mozilla/5.0'})
+              data=urllib.request.urlopen(req,timeout=120).read()
+              if not data.startswith(b'OggS'):
+                  raise SystemExit(f'{out} is not OGG audio')
+              pathlib.Path(out).write_bytes(data)
+              print(out,len(data),files[0].get('fileName'))
+          PY
+          test $(wc -c < assets/captains-dash-final-clean-v3.ogg) -gt 700000
+          test $(wc -c < assets/captains-dash-victory-v2.ogg) -gt 200000
+
+      - name: Apply v0.26 patch
+        run: python3 scripts/release_v026.py
+
+      - name: Set package version
+        run: npm version 0.26.0 --no-git-tag-version --allow-same-version
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: JavaScript syntax checks
+        run: |
+          node --check menu.js
+          node --check voyage-v014.js
+          node --check engine-v014.mjs
+
+      - name: Run regression tests
+        run: |
+          npm test
+          node tests/rules-v022.mjs
+          node tests/rules-v023.mjs
+          node tests/rules-v024.mjs
+          node tests/rules-v025.mjs
+          node tests/rules-v026.mjs
+
+      - name: Build release
+        run: npm run build
+
+      - name: Verify built v0.26 output
+        shell: bash
+        run: |
+          set -euo pipefail
+          grep -q "v0.26 TEST" dist/index.html
+          grep -q "randomPortraitSet" dist/menu.js
+          grep -q "portraits stay unique" dist/index.html
+          grep -q "captains-dash-final-clean-v3.ogg" dist/menu.js
+          grep -q "captains-dash-victory-v2.ogg" dist/menu.js
+          grep -q "state.status==='won'?'victory'" dist/voyage-v014.js
+          for i in $(seq -w 1 10); do test -f "dist/assets/captain-v026-$i.svg"; done
+          test -s dist/assets/captains-dash-final-clean-v3.ogg
+          test -s dist/assets/captains-dash-victory-v2.ogg
+          echo "v0.26 release build verified"
+
+      - name: Commit v0.26 implementation
+        shell: bash
+        run: |
+          git config user.name "captains-dash-build-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add menu.js voyage-v014.js index.html package.json package-lock.json tests/rules-v025.mjs \
+            assets/captain-v026-*.svg assets/captains-dash-final-clean-v3.ogg assets/captains-dash-victory-v2.ogg
+          if git diff --cached --quiet; then
+            echo "v0.26 files already up to date"
+          else
+            git commit -m "Release v0.26 unique pirate portraits and final/victory music"
+            git push origin HEAD:release/v0.26
+          fi
