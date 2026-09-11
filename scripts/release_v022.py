@@ -62,17 +62,14 @@ s = replace_once(s, old_icons, new_icons, 'new test icons')
 s = replace_once(s, 'The Final Isle · v0.21', 'The Final Isle · v0.22', 'HUD version')
 s = replace_once(s, "'All 81 cards · v0.15 Final'", "'All 81 cards · v0.22'", 'card library version')
 
-# Clearer Dock error when global zone is open but this captain has not passed the prior zone.
 old_prep = "function prep(id){if(state.exp)return showExp();if(state.location!=='dock'){modal(CARDS[id].name,card(id)+'<p>Place or take a Pirate at Dock to launch an Expedition.</p>');return}if(!available(state,id))return toast('Zone locked.');const c=CARDS[id],p=current(state),peek=p.crew.some(c=>c.id==='C13'&&!c.exhausted)||p.treasures.includes('T01');"
 new_prep = "function prep(id){if(state.exp)return showExp();if(state.location!=='dock'){modal(CARDS[id].name,card(id)+'<p>Place or take a Pirate at Dock to launch an Expedition.</p>');return}const c=CARDS[id],z=c.kind==='final'?4:c.zone;if(!unlocked(state,z))return toast('Zone locked.');if(!playerZoneEligible(state,z))return toast(`Complete a Zone ${['','I','II','III'][z-1]} Mission first — unless no Missions remain there.`);if(!available(state,id))return toast('Mission unavailable.');const p=current(state),peek=p.crew.some(c=>c.id==='C13'&&!c.exhausted)||p.treasures.includes('T01');"
 s = replace_once(s, old_prep, new_prep, 'Dock prerequisite message')
 
-# Expedition copy now explicitly says D8.
 s = s.replace("Array.from({length:diceCount},()=>'<div class=\"die dieWaiting\">?</div>').join('')", "Array.from({length:diceCount},()=>'<div class=\"die dieWaiting d8\" title=\"D8\"><small>D8</small><b>?</b></div>').join('')")
 s = s.replace("`Roll ${diceCount} dice`", "`Roll ${diceCount} d8${diceCount===1?'':'s'}`")
 s = s.replace("<div class=\"die ${d==='SKULL'?'skullDie':d==='GOLD'?'goldDie':''}\">", "<div class=\"die d8 ${d==='SKULL'?'skullDie':d==='GOLD'?'goldDie':''}\">")
 
-# Completed Mission archive in My Captain.
 old_player = "if(name==='player'){const p=state.players[+d.index];modal(p.name+' · Crew & Treasure',`<div class=\"captainIdentity\"><img src=\"assets/${portraits[state.turn]}\" alt=\"Captain portrait\"><div><h2>${esc(p.name)}</h2><p class=\"captainResources\">${resourceIcon('gold')} ${p.gold} Gold · ${resourceIcon('supply')} ${p.supply} Supply</p></div></div>`+'<h3>Crew</h3><div class=\"vGrid\">'+(p.crew.map(c=>card(c.id,crewStatusIcon(c.exhausted))).join('')||'<p>No Crew aboard.</p>')+'</div><h3>Treasure</h3><div class=\"vGrid\">'+(p.treasures.map(id=>card(id)).join('')||'<p>No Treasure yet.</p>')+'</div>');return}"
 new_player = "if(name==='player'){const index=+d.index,p=state.players[index],completed=playerCompletedMissions(state,index);const completedHtml=completed.length?completed.map(id=>{const c=CARDS[id];return `<article class=\"completedMissionCard\"><div class=\"completedMissionArt\">${art(c)}</div><div><small>ZONE ${['','I','II','III'][c.zone]}</small><strong>${esc(c.name)}</strong><span>${icons[c.test]} ${esc(c.test)} · Target ${c.target}</span>${rewardBadges(c)}</div><b class=\"completedCheck\">✓</b></article>`}).join(''):'<p class=\"emptyCompleted\">No completed Missions yet.</p>';modal(p.name+' · Captain Log',`<div class=\"captainIdentity\"><img src=\"assets/${portraits[index]}\" alt=\"Captain portrait\"><div><h2>${esc(p.name)}</h2><p class=\"captainResources\">${resourceIcon('gold')} ${p.gold} Gold · ${resourceIcon('supply')} ${p.supply} Supply · ${crewGroupIcon()} ${p.crew.filter(c=>!c.exhausted).length}/${p.crew.length} Ready</p></div></div>`+'<h3>Crew</h3><div class=\"vGrid\">'+(p.crew.map(c=>card(c.id,crewStatusIcon(c.exhausted))).join('')||'<p>No Crew aboard.</p>')+'</div><h3>Treasure</h3><div class=\"vGrid\">'+(p.treasures.map(id=>card(id)).join('')||'<p>No Treasure yet.</p>')+'</div><section class=\"completedMissions\"><header><h3>Completed Missions</h3><span>'+completed.length+' cleared</span></header><div class=\"completedMissionGrid\">'+completedHtml+'</div></section>');return}"
 s = replace_once(s, old_player, new_player, 'completed missions in captain detail')
@@ -114,12 +111,26 @@ if 'v0.22 Test' not in s and 'v0.22 TEST' not in s:
 p.write_text(s)
 
 
+# ---------------------------------------------------------------------------
+# Existing regression helper: seed prior-zone clears when testing a deeper
+# Mission directly. This keeps old mission-mechanics tests valid under the
+# new v0.22 personal progression gate.
+# ---------------------------------------------------------------------------
+p = Path('tests/rules-v014.mjs')
+s = p.read_text()
+old_helper = "function expedition(id='Z1-01',crew=['C02'],treasures=[]){let s=newGame();const p=current(s);p.gold=30;p.supply=30;p.crew=crew.map((id,i)=>({id,uid:'test'+i,exhausted:false}));p.treasures=treasures;s.progress=[2,2,1];if(id.startsWith('F'))s.final=[id];else s.stacks[+id[1]][0]=[id];s.workers.dock=null;s=act(s,{type:'worker',location:'dock'});return act(s,{type:'launch',mission:id,crew:p.crew.map(c=>c.uid)})}"
+new_helper = "function expedition(id='Z1-01',crew=['C02'],treasures=[]){let s=newGame();const p=current(s);p.gold=30;p.supply=30;p.crew=crew.map((id,i)=>({id,uid:'test'+i,exhausted:false}));p.treasures=treasures;s.progress=[2,2,1];const zone=id.startsWith('F')?4:+id[1];for(let prev=1;prev<zone;prev++){const prior=DATA.cards.find(c=>c.zone===prev)?.id;if(prior)s.missionDiscard.unshift({id:prior,player:p.name,playerIndex:s.turn,result:'success'})}if(id.startsWith('F'))s.final=[id];else s.stacks[+id[1]][0]=[id];s.workers.dock=null;s=act(s,{type:'worker',location:'dock'});return act(s,{type:'launch',mission:id,crew:p.crew.map(c=>c.uid)})}"
+s = replace_once(s, old_helper, new_helper, 'legacy expedition test fixture progression')
+p.write_text(s)
+
+
 # Static checks.
 checks = {
     'engine-v014.mjs': ["FACES=['SKULL',0,0,1,1,2,2,'GOLD']", 'playerZoneEligible', 'playerCompletedMissions', 'FACES.length', 'playerIndex:s.turn'],
     'voyage-v014.js': ['The Final Isle · v0.22', 'sailingIcon', 'searchIcon', 'Completed Missions', 'completedMissionCard', 'playerZoneEligible', 'Roll ${diceCount} d8'],
     'voyage-table.css': ['v0.22 — D8', '.completedMissionCard', '.die.d8', '.testIcon'],
     'menu.js': ['version:"0.22"'],
+    'tests/rules-v014.mjs': ['playerIndex:s.turn', 'for(let prev=1;prev<zone;prev++)'],
 }
 for file, markers in checks.items():
     text = Path(file).read_text()
