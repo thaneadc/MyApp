@@ -1,0 +1,37 @@
+name: Smoke Test Captain's Dash v0.26 Production
+
+on:
+  push:
+    branches:
+      - 'release/v0.26'
+    paths:
+      - '.github/workflows/smoke-v026-production.yml'
+
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Verify production v0.26 and assets
+        shell: bash
+        run: |
+          set -euo pipefail
+          BASE="https://captains-dash-the-final-isle.vercel.app"
+          ok=0
+          for attempt in $(seq 1 18); do
+            echo "Production check attempt $attempt"
+            code=$(curl -L -sS -o /tmp/page.html -w '%{http_code}' --max-time 25 "$BASE/" || true)
+            if [ "$code" = "200" ] && grep -q "v0.26 TEST" /tmp/page.html; then
+              pcode=$(curl -L -sS -o /tmp/portrait.svg -w '%{http_code}' --max-time 25 "$BASE/assets/captain-v026-01.svg" || true)
+              fcode=$(curl -L -sS -o /tmp/final.ogg -w '%{http_code}' --max-time 25 "$BASE/assets/captains-dash-final-clean-v3.ogg" || true)
+              vcode=$(curl -L -sS -o /tmp/victory.ogg -w '%{http_code}' --max-time 25 "$BASE/assets/captains-dash-victory-v2.ogg" || true)
+              if [ "$pcode" = "200" ] && grep -q 'viewBox="0 0 256 256"' /tmp/portrait.svg \
+                && [ "$fcode" = "200" ] && [ "$(head -c 4 /tmp/final.ogg)" = "OggS" ] \
+                && [ "$vcode" = "200" ] && [ "$(head -c 4 /tmp/victory.ogg)" = "OggS" ]; then
+                echo "PRODUCTION_V026_OK"
+                ok=1
+                break
+              fi
+            fi
+            sleep 5
+          done
+          [ "$ok" = "1" ] || { echo "Production did not serve verified v0.26 in time"; exit 1; }
