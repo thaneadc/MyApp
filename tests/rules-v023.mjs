@@ -15,7 +15,7 @@ const ui=fs.readFileSync(new URL('../voyage-v014.js',import.meta.url),'utf8');
 const css=fs.readFileSync(new URL('../voyage-table.css',import.meta.url),'utf8');
 assert.match(ui,/quartersReadyAll/);
 assert.match(ui,/prepExpeditionLayout/);
-assert.match(ui,/binocularLens/);
+assert.match(ui,/(binocularLens|spyglassBody)/,'Search must use a maritime optical icon');
 assert.match(ui,/helmHandle/);
 assert.doesNotMatch(ui,/name="ready"/,'Crew Quarters must not show per-Crew ready checkboxes');
 assert.match(css,/\.prepCrewChoice/);
