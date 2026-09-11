@@ -27,13 +27,26 @@
       o.connect(g); g.connect(audioCtx.destination); o.start(); g.gain.exponentialRampToValueAtTime(.0001,audioCtx.currentTime+dur); o.stop(audioCtx.currentTime+dur);
     } catch(e) {}
   }
+  const MUSIC_TRACKS={adventure:'assets/captains-dash-adventure-v2.ogg',adrenaline:'assets/captains-dash-adrenaline-v2.ogg'};
   const soundtrack=new Audio();
   soundtrack.id='pirateMusic';
   soundtrack.loop=true;
-  soundtrack.preload='metadata';
-  soundtrack.src=soundtrack.canPlayType('audio/ogg; codecs="vorbis"')?'assets/pirate-theme.ogg':'assets/pirate-theme.mp3';
+  soundtrack.preload='auto';
+  soundtrack.src=MUSIC_TRACKS.adventure;
   document.body.appendChild(soundtrack);
-  let musicStarted=false;
+  let musicStarted=false,musicMode='adventure';
+  function setMusicMode(mode='adventure') {
+    mode=mode==='adrenaline'?'adrenaline':'adventure';
+    if(mode===musicMode&&soundtrack.src.includes(MUSIC_TRACKS[mode]))return;
+    const shouldPlay=musicEnabled&&settings.music>0&&(musicStarted||!soundtrack.paused);
+    musicMode=mode;
+    soundtrack.pause();
+    soundtrack.src=MUSIC_TRACKS[mode];
+    soundtrack.loop=true;
+    soundtrack.currentTime=0;
+    soundtrack.volume=Math.max(0,Math.min(1,settings.music/100));
+    if(shouldPlay){musicStarted=true;soundtrack.play().catch(()=>{});}
+  }
   function toggleAmbient(force) {
     musicEnabled=force ?? !musicEnabled;
     soundtrack.volume=Math.max(0,Math.min(1,settings.music/100));
@@ -42,7 +55,8 @@
     document.querySelectorAll('[data-music-toggle],#musicBtn').forEach(b=>{b.style.opacity=musicEnabled?'1':'.45';b.setAttribute('aria-pressed',String(musicEnabled));});
   }
   document.addEventListener('click',ev=>{if(ev.target.closest('[data-music-toggle]'))toggleAmbient();});
-  window.addEventListener('captainsdash:startgame',()=>toggleAmbient(musicEnabled));
+  window.addEventListener('captainsdash:music-mode',ev=>setMusicMode(ev.detail?.mode));
+  window.addEventListener('captainsdash:startgame',()=>{setMusicMode('adventure');toggleAmbient(musicEnabled)});
   document.addEventListener('visibilitychange',()=>{if(document.hidden)soundtrack.pause();else if(musicStarted&&musicEnabled&&settings.music>0)soundtrack.play().catch(()=>{});});
   function closePanels() {
     document.body.classList.remove("menu-modal-open");
@@ -98,7 +112,7 @@
 
   function currentSetup() {
     return {
-      version:"0.20",
+      version:"0.21",
       players:count,
       names:[...document.querySelectorAll("#names input")].map(x=>x.value.trim()||"Captain"),
       captains:captainNames.slice(0,count),

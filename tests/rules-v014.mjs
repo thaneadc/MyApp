@@ -21,7 +21,7 @@ let e=expedition();eq(baseScore(current(e),e.exp),4);e=act(e,{type:'roll'},()=>.
 e=expedition('Z1-03',['C02']);eq(baseScore(current(e),e.exp),0);e=act(e,{type:'roll'},()=>.2);e=act(e,{type:'resolve'});eq(e.exp.phase,'loss');e=act(e,{type:'loss',id:'test0'});eq(current(e).crew.length,0);eq(e.stacks[1][0][0],'Z1-03');
 e=expedition('Z2-01',['C02'],['T09']);let values=[0,.99];e=act(e,{type:'roll'},()=>values.shift());eq(e.exp.phase,'loss');eq(current(e).gold,32);eq(controls(e),[]);throws(()=>act(e,{type:'control',id:'fortune',index:0}));
 e=expedition('Z1-02',['C04']);e=act(e,{type:'roll'},()=>.2);eq(controls(e).length,1);e=act(e,{type:'control',id:'test0'},()=>0);eq(e.exp.phase,'loss');
-e=expedition('Z1-01',['C12']);e=act(e,{type:'roll'},()=>0);e=act(e,{type:'loss',prevent:'surgeon'});eq(current(e).crew.length,1);eq(current(e).crew[0].exhausted,false);
+e=expedition('Z1-01',['C12']);eq(current(e).crew[0].exhausted,true);e=act(e,{type:'roll'},()=>0);e=act(e,{type:'loss',prevent:'surgeon'});eq(current(e).crew.length,1);eq(current(e).crew[0].exhausted,true);
 e=expedition('Z1-01',['C10','C01']);e=act(e,{type:'roll'},()=>0);throws(()=>act(e,{type:'loss',id:'test1'}));e=act(e,{type:'loss',id:'test0'});eq(current(e).crew[0].id,'C01');
 e=expedition('Z1-01',['C01'],['T19']);e=act(e,{type:'roll'},()=>0);e=act(e,{type:'loss',prevent:'medallion'});eq(current(e).treasures,[]);eq(e.treasureDiscard,['T19']);
 e=expedition('Z3-01',['C06'],['T18']);eq(e.exp.paid,3);eq(supplyCost(current(e),1),1);

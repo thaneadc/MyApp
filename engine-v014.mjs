@@ -32,7 +32,7 @@ export function newGame(setup={},rng=Math.random){
 }
 function log(s,t){s.log.unshift(t);s.log=s.log.slice(0,100)}
 function endAction(s){s.exp=null;s.location=null;s.blackRefreshed=false;if(s.status!=='playing')return;if(s.phase==='place'){s.phase='take';return}s.phase='place';s.placed=null;s.turn=(s.turn+1)%s.players.length;if(!s.turn)s.round++}
-const selected=(p,e)=>p.crew.filter(c=>e.crew.includes(c.uid)&&!c.exhausted);
+const selected=(p,e)=>p.crew.filter(c=>e.crew.includes(c.uid));
 const count=(p,e,id)=>selected(p,e).filter(c=>c.id===id).length;
 const has=(e,id)=>e.treasures.includes(id);
 export function testInfo(e){const c=CARDS[e.mission];return c.kind==='final'?c.steps[e.step||0]:c}
@@ -78,7 +78,7 @@ export function act(original,a,rng=Math.random){const s=normalizeSharedPools(str
  if(c.id==='F4')must(crew.length===4&&vet>=2&&p.treasures.length>=2,'Requires 4 Crew, 2 Veterans and 2 Treasures');if(c.id==='F5')must(new Set(crew.map(c=>c.id)).size>=3&&vet>=1,'Requires 3 different Crew types and 1 Veteran');
  let gold=0;if(c.id==='F3'){if(a.payment==='treasure'){must(p.treasures.includes(a.sacrifice),'Choose Treasure to discard');p.treasures=p.treasures.filter(id=>id!==a.sacrifice);exp.treasures=[...p.treasures];s.treasureDiscard.push(a.sacrifice)}else gold=6}
  if(a.powder)must(has(exp,'T07')&&(c.test==='Combat'||c.steps?.some(st=>st.test==='Combat')),'Black Powder Horn requires a Combat test');
- const cost=supplyCost(p,z,exp.treasures,a.crew)+(a.powder?1:0);must(p.gold>=gold&&p.supply>=cost,'Not enough Gold or Supply');p.gold-=gold;p.supply-=cost;exp.paid=cost;p.blessing=null;s.exp=exp;return s;
+ const cost=supplyCost(p,z,exp.treasures,a.crew)+(a.powder?1:0);must(p.gold>=gold&&p.supply>=cost,'Not enough Gold or Supply');p.gold-=gold;p.supply-=cost;for(const x of p.crew)if(a.crew.includes(x.uid))x.exhausted=true;exp.paid=cost;p.blessing=null;s.exp=exp;return s;
  }
  if(a.type==='work'){must(loc==='work','Use Harbor Work');p.gold+=3}
  else if(a.type==='market'){must(loc==='market','Use Market');must(Number.isInteger(a.amount)&&a.amount>=1&&a.amount<=5&&p.gold>=a.amount,'Buy 1–5 Supply within your Gold');p.gold-=a.amount;p.supply+=a.amount}
