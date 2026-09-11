@@ -1,0 +1,94 @@
+name: Build Captain's Dash v0.21
+
+on:
+  push:
+    branches: ['release/v0.21']
+    paths: ['.github/workflows/release-v021.yml']
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build-v021:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout release branch
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Apply v0.21 patch
+        run: python3 scripts/release_v021.py
+
+      - name: Set package version
+        run: npm version 0.21.0 --no-git-tag-version --allow-same-version
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: JavaScript syntax checks
+        run: |
+          node --check menu.js
+          node --check voyage-v014.js
+          node --check engine-v014.mjs
+
+      - name: Run rules regression tests
+        run: npm test
+
+      - name: Verify expedition fatigue and Crew Quarters recovery
+        shell: bash
+        run: |
+          node --input-type=module <<'NODE'
+          import assert from 'node:assert/strict';
+          import {newGame,current,act,baseScore} from './engine-v014.mjs';
+          let s=newGame({players:2},()=>0.25);
+          const p=current(s);p.gold=30;p.supply=30;
+          p.crew=[{id:'C08',uid:'sailmaster',exhausted:false}];
+          s.stacks[1][0]=['Z1-03'];s.workers.dock=null;
+          s=act(s,{type:'worker',location:'dock'});
+          s=act(s,{type:'launch',mission:'Z1-03',crew:['sailmaster']});
+          assert.equal(current(s).crew[0].exhausted,true,'Expedition Crew must become Exhausted');
+          assert.ok(baseScore(current(s),s.exp)>0,'Committed exhausted Crew must still score in the current Expedition');
+          s.exp=null;s.location='quarters';
+          s=act(s,{type:'ready',ids:['sailmaster']});
+          assert.equal(current(s).crew[0].exhausted,false,'Crew Quarters must Ready exhausted Crew');
+          console.log('v0.21 fatigue regression passed');
+          NODE
+
+      - name: Verify uploaded soundtrack assets
+        shell: bash
+        run: |
+          test $(wc -c < assets/captains-dash-adventure-v2.ogg) -gt 1000000
+          test $(wc -c < assets/captains-dash-adrenaline-v2.ogg) -gt 900000
+          test "$(head -c 4 assets/captains-dash-adventure-v2.ogg)" = "OggS"
+          test "$(head -c 4 assets/captains-dash-adrenaline-v2.ogg)" = "OggS"
+
+      - name: Build release
+        run: npm run build
+
+      - name: Verify v0.21 production bundle
+        shell: bash
+        run: |
+          grep -q "v0.21 Test" dist/index.html
+          grep -q "The Final Isle · v0.21" dist/voyage-v014.js
+          grep -q "expeditionTable" dist/voyage-v014.js
+          grep -q "Ready Crew / Total Crew" dist/voyage-v014.js
+          grep -q "captains-dash-adventure-v2.ogg" dist/menu.js
+          grep -q "captains-dash-adrenaline-v2.ogg" dist/menu.js
+          test -s dist/assets/captains-dash-adventure-v2.ogg
+          test -s dist/assets/captains-dash-adrenaline-v2.ogg
+          echo "v0.21 bundle verified"
+
+      - name: Commit v0.21 implementation
+        shell: bash
+        run: |
+          git config user.name "captains-dash-build-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add engine-v014.mjs voyage-v014.js voyage-table.css menu.js index.html tests/rules-v014.mjs package.json package-lock.json
+          if git diff --cached --quiet; then
+            echo "v0.21 implementation already committed"
+          else
+            git commit -m "Release v0.21 fatigue, soundtrack and cinematic Expedition UI"
+            git push origin HEAD:release/v0.21
+          fi
