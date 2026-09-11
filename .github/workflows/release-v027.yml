@@ -1,0 +1,76 @@
+name: Build Captain's Dash v0.27
+
+on:
+  push:
+    branches: ['release/v0.27']
+    paths:
+      - 'scripts/release_v027.py'
+      - '.github/workflows/release-v027.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build-v027:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout release branch
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Apply portrait rollback
+        run: python3 scripts/release_v027.py
+
+      - name: Set package version
+        run: npm version 0.27.0 --no-git-tag-version
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: JavaScript syntax checks
+        run: |
+          node --check menu.js
+          node --check voyage-v014.js
+          node --check engine-v014.mjs
+
+      - name: Core rules regression
+        run: npm test
+
+      - name: v0.27 portrait regression
+        run: node tests/rules-v027.mjs
+
+      - name: Build release
+        run: npm run build
+
+      - name: Verify built v0.27 output
+        shell: bash
+        run: |
+          set -euo pipefail
+          grep -q 'v0.27 TEST' dist/index.html
+          grep -q '014ea26d527fb00d.jpg' dist/menu.js
+          grep -q '724be8a80f197bb0.jpg' dist/voyage-v014.js
+          ! grep -q 'randomPortraitSet' dist/menu.js
+          ! grep -q 'cyclePortrait(' dist/menu.js
+          grep -q 'captains-dash-final-clean-v3.ogg' dist/menu.js
+          grep -q 'captains-dash-victory-v2.ogg' dist/menu.js
+          test -s dist/assets/014ea26d527fb00d.jpg
+          test -s dist/assets/5d6137ac745946c3.jpg
+          test -s dist/assets/c70de609c89d8c4c.jpg
+          test -s dist/assets/724be8a80f197bb0.jpg
+          test -s dist/assets/captains-dash-final-clean-v3.ogg
+          test -s dist/assets/captains-dash-victory-v2.ogg
+
+      - name: Commit v0.27 implementation
+        shell: bash
+        run: |
+          git config user.name "captains-dash-build-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add menu.js index.html voyage-v014.js tests/rules-v027.mjs package.json package-lock.json
+          if git diff --cached --quiet; then
+            echo "v0.27 implementation already committed"
+          else
+            git commit -m "Release v0.27 restore original fixed captain portraits"
+            git push origin HEAD:release/v0.27
+          fi
