@@ -6,6 +6,15 @@ export const FACES=['SKULL',0,0,1,2,'GOLD'];
 export const LOCATIONS={tavern:'Tavern',market:'Market',dock:'Dock',work:'Harbor Work',quarters:'Crew Quarters',black:'Black Market',veteran:"Veteran’s Den",witch:'Sea Witch'};
 const must=(v,m)=>{if(!v)throw Error(m)};
 export const current=s=>s.players[s.turn];
+export function normalizeSharedPools(s){
+ if(!s||!Array.isArray(s.players))return s;
+ const fallback=(key)=>s.players.find(p=>Array.isArray(p?.[key]))?.[key];
+ if(!Array.isArray(s.market))s.market=[...(fallback('market')||[])];
+ if(!Array.isArray(s.veteranMarket))s.veteranMarket=[...(fallback('veteranMarket')||[])];
+ if(!Array.isArray(s.treasureDeck))s.treasureDeck=[...(fallback('treasureDeck')||[])];
+ for(const p of s.players){delete p.market;delete p.veteranMarket;delete p.treasureDeck;delete p.crewDeck;delete p.veteranDeck}
+ return s;
+}
 export function shuffle(xs,rng=Math.random){const a=[...xs];for(let i=a.length-1;i>0;i--){const j=Math.floor(rng()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
 const instance=(s,id)=>({id,uid:'crew-'+s.nextId++,exhausted:false});
 export function unlocked(s,z){return z===1||(z===2&&s.players.length===2)||s.progress[z-2]>=[2,2,1][z-2]}
@@ -17,7 +26,7 @@ export function newGame(setup={},rng=Math.random){
  s.players=Array.from({length:Math.max(2,Math.min(4,setup.players||2))},(_,i)=>({name:setup.names?.[i]||'Player '+(i+1),gold:i?3:2,supply:i>=2?3:2,crew:[instance(s,'C01')],treasures:[],blessing:null}));
  s.crewDeck=shuffle(DATA.cards.filter(c=>c.kind==='crew'&&c.tier==='Common').flatMap(c=>Array(c.id==='C01'?4-s.players.length:4).fill(c.id)),rng);
  s.veteranDeck=shuffle(DATA.cards.filter(c=>c.tier==='Veteran').flatMap(c=>Array(4).fill(c.id)),rng);
- s.market=s.crewDeck.splice(0,3);s.veteranMarket=s.veteranDeck.splice(0,3);s.treasureDeck=shuffle(DATA.cards.filter(c=>c.kind==='treasure').map(c=>c.id),rng);
+ s.market=s.crewDeck.splice(0,3);s.veteranMarket=s.veteranDeck.splice(0,3);s.treasureDeck=shuffle(DATA.cards.filter(c=>c.kind==='treasure').map(c=>c.id),rng);normalizeSharedPools(s);
  for(const z of [1,2,3]){const n=z===3?2:3,ids=shuffle(DATA.cards.filter(c=>c.zone===z).map(c=>c.id),rng).slice(0,n*2);s.stacks[z]=Array.from({length:n},(_,i)=>ids.slice(i*2,i*2+2))}
  s.final=shuffle(DATA.cards.filter(c=>c.kind==='final').map(c=>c.id),rng).slice(0,3);return s;
 }
@@ -49,7 +58,7 @@ function resolveOutcome(s,rng){const p=current(s),e=s.exp,c=CARDS[e.mission],t=t
 function checkResult(s,rng){const p=current(s),e=s.exp;e.total=totalScore(p,e);e.success=!e.dice.includes('SKULL')&&e.total>=testInfo(e).target;if(e.success&&CARDS[e.mission].kind==='final'&&e.step===0){log(s,p.name+' passed Final Step 1');e.firstDice=[...e.dice];e.step=1;e.phase='ready';e.dice=[];e.used=[];e.awarded={};e.success=null;return}if(!e.success){e.phase='loss';return}resolveOutcome(s,rng)}
 function awardDice(p,e,newFaces){p.gold+=newFaces.filter(d=>d==='GOLD').length*(has(e,'T09')?2:1);e.awarded||={};if(testInfo(e).test==='Combat'&&has(e,'T06')&&e.dice.includes(2)&&!e.awarded.T06){p.gold++;e.awarded.T06=true}if(has(e,'T16')&&e.dice.includes('SKULL')&&e.dice.includes('GOLD')&&!e.awarded.T16){p.gold++;e.awarded.T16=true}}
 export function controls(s){const e=s.exp;if(!e||e.phase!=='dice'||e.dice.includes('SKULL'))return [];const p=current(s),t=testInfo(e).test,opts=[];if(e.dice.includes(0)){for(const c of selected(p,e))if((c.id==='C04'&&t==='Search'||c.id==='C07'&&t==='Combat')&&!e.used.includes(c.uid))opts.push({id:c.uid,label:CARDS[c.id].name+' · reroll a 0'});if(has(e,'T14')&&!e.used.includes('T14'))opts.push({id:'T14',label:'Loaded Bones · 0 → 1'})}if(e.blessing==='fortune'&&!e.fortuneUsed)opts.push({id:'fortune',label:'Fortune · reroll one die'});return opts}
-export function act(original,a,rng=Math.random){const s=structuredClone(original),p=current(s),e=s.exp;must(s.version==='0.15'&&s.status==='playing','Start a v0.15 voyage');
+export function act(original,a,rng=Math.random){const s=normalizeSharedPools(structuredClone(original)),p=current(s),e=s.exp;must(s.version==='0.15'&&s.status==='playing','Start a v0.15 voyage');
  if(s.overflow){must(a.type==='discardOwned','Choose a card to discard first');if(s.overflow==='crew')discardCrew(s,p,a.id);else{must(p.treasures.includes(a.id),'Choose owned Treasure');p.treasures.splice(p.treasures.indexOf(a.id),1);s.treasureDiscard.push(a.id)}if(!checkCapacity(s)){if(e)nextReward(s,rng);else endAction(s)}return s}
  if(a.type==='worker'){must(legalWorker(s,a.location),'Choose a legal location: take a shared Pirate from another location, never the just-placed Pirate');s.location=a.location;if(s.phase==='place'){s.workers[a.location]=true;s.placed=a.location}else s.workers[a.location]=null;return s}
  if(e){
