@@ -1,0 +1,74 @@
+name: Build Captain's Dash v0.29
+
+on:
+  push:
+    branches: ['release/v0.29']
+    paths:
+      - 'scripts/release_v029.py'
+      - '.github/workflows/release-v029.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build-v029:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout release branch
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Install image tooling
+        run: python3 -m pip install --quiet pillow
+
+      - name: Apply portrait selection and import supplied portraits
+        run: python3 scripts/release_v029.py
+
+      - name: Set package version
+        run: npm version 0.29.0 --no-git-tag-version
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: JavaScript syntax checks
+        run: |
+          node --check menu.js
+          node --check voyage-v014.js
+          node --check engine-v014.mjs
+
+      - name: Core rules regression
+        run: npm test
+
+      - name: v0.29 portrait regression
+        run: node tests/rules-v029.mjs
+
+      - name: Build release
+        run: npm run build
+
+      - name: Verify built v0.29 output
+        shell: bash
+        run: |
+          set -euo pipefail
+          grep -q 'v0.29 TEST' dist/index.html
+          grep -q 'portraitOptions' dist/menu.js
+          grep -q 'cyclePortrait' dist/menu.js
+          grep -q 'captain-user-06.webp' dist/menu.js
+          grep -q 'if(!p.portrait)p.portrait=' dist/voyage-v014.js
+          grep -q 'captains-dash-final-clean-v3.ogg' dist/menu.js
+          grep -q 'captains-dash-victory-v2.ogg' dist/menu.js
+          for i in 01 02 03 04 05 06; do test -s "dist/assets/captain-user-${i}.webp"; done
+
+      - name: Commit v0.29 implementation
+        shell: bash
+        run: |
+          git config user.name "captains-dash-build-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add menu.js voyage-v014.js index.html tests/rules-v029.mjs package.json package-lock.json assets/captain-user-*.webp
+          if git diff --cached --quiet; then
+            echo "v0.29 implementation already committed"
+          else
+            git commit -m "Release v0.29 selectable supplied captain portraits"
+            git push origin HEAD:release/v0.29
+          fi
