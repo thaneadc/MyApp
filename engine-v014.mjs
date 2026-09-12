@@ -25,8 +25,8 @@ export function locationOpen(s,l){return l==='black'?s.progress[1]>=1:l==='veter
 export function legalWorker(s,l){return !s.location&&!s.exp&&!s.overflow&&locationOpen(s,l)&&(s.phase==='place'?s.workers[l]===null:s.workers[l]!==null&&l!==s.placed)}
 export function playerCompletedMissions(s,playerIndex=s.turn){const p=s.players[playerIndex];if(!p)return [];return s.missionDiscard.filter(m=>m.result==='success'&&(m.playerIndex===playerIndex||(m.playerIndex==null&&m.player===p.name))).map(m=>m.id)}
 export function zoneHasMission(s,z){return z===4?!!s.final?.length:(s.stacks?.[z]||[]).some(st=>st?.length)}
-export function playerZoneEligible(s,z,playerIndex=s.turn){if(z<=1)return true;const prev=z-1;if(!zoneHasMission(s,prev))return true;return playerCompletedMissions(s,playerIndex).some(id=>CARDS[id]?.zone===prev)}
-export function available(s,id){const c=CARDS[id];if(!c)return false;const z=c.kind==='final'?4:c.zone;if(!z||!unlocked(s,z)||!playerZoneEligible(s,z))return false;return c.kind==='final'?s.final[0]===id:s.stacks[c.zone].some(st=>st[0]===id)}
+export function playerZoneEligible(s,z,playerIndex=s.turn){return unlocked(s,z)}
+export function available(s,id){const c=CARDS[id];if(!c)return false;const z=c.kind==='final'?4:c.zone;if(!z||!unlocked(s,z))return false;return c.kind==='final'?s.final[0]===id:s.stacks[c.zone].some(st=>st[0]===id)}
 export function newGame(setup={},rng=Math.random){
  const s={version:'0.15',nextId:1,turn:0,round:1,status:'playing',mode:setup.mode||'local',phase:'place',placed:null,location:null,workers:Object.fromEntries(Object.keys(LOCATIONS).map(l=>[l,["tavern","dock"].includes(l)?true:null])),progress:[0,0,0],stacks:{},final:[],missionDiscard:[],treasureDiscard:[],crewDiscard:[],log:[],exp:null,overflow:null,blackRefreshed:false};
  const playerCount=Math.max(2,Math.min(4,setup.players||2));
