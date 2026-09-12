@@ -1,5 +1,5 @@
 export const DATA = {
-  "version": "0.14 Final",
+  "version": "0.30 Master Rules",
   "cards": [
     {
       "id": "C01",
@@ -43,7 +43,7 @@ export const DATA = {
         "Sailing": 0,
         "Search": 0
       },
-      "text": "Bombardment\n- On a Combat Mission, gain +1 Combat"
+      "text": "Bombardment\n- In Zone II and beyond, gain +1 Combat"
     },
     {
       "id": "C03",
@@ -61,11 +61,11 @@ export const DATA = {
       "tier": "Veteran",
       "cost": 6,
       "stats": {
-        "Combat": 0,
+        "Combat": 1,
         "Sailing": 5,
         "Search": 1
       },
-      "text": "Sea Route\n- In Zone II, Zone III or Final Isle, gain +1 Sailing"
+      "text": "Sea Route\n- In Zone III or Final Isle, gain +1 Sailing"
     },
     {
       "id": "C04",
@@ -103,7 +103,7 @@ export const DATA = {
         "height": 209
       },
       "tier": "Common",
-      "cost": 3,
+      "cost": 4,
       "stats": {
         "Combat": 1,
         "Sailing": 2,
@@ -128,7 +128,7 @@ export const DATA = {
       "cost": 6,
       "stats": {
         "Combat": 3,
-        "Sailing": 3,
+        "Sailing": 4,
         "Search": 2
       },
       "text": "Prepared Crew\n- Spend 1 fewer Supply when starting an Expedition\n- Minimum cost remains 1"
@@ -149,7 +149,7 @@ export const DATA = {
       "tier": "Veteran",
       "cost": 6,
       "stats": {
-        "Combat": 5,
+        "Combat": 4,
         "Sailing": 2,
         "Search": 2
       },
@@ -193,7 +193,7 @@ export const DATA = {
       "tier": "Veteran",
       "cost": 7,
       "stats": {
-        "Combat": 0,
+        "Combat": 1,
         "Sailing": 3,
         "Search": 5
       },
@@ -215,11 +215,11 @@ export const DATA = {
       "tier": "Veteran",
       "cost": 7,
       "stats": {
-        "Combat": 8,
+        "Combat": 9,
         "Sailing": 0,
         "Search": 0
       },
-      "text": "Reckless Assault\n- On a Combat Mission, gain +1 Combat\n- If the Mission fails and you must lose 1 Crew,\n  Berserker must be lost first"
+      "text": "Reckless Assault\n- If the Mission fails and you must lose 1 Crew,\n  Berserker must be lost first"
     },
     {
       "id": "C11",
@@ -259,9 +259,9 @@ export const DATA = {
       "tier": "Common",
       "cost": 4,
       "stats": {
-        "Combat": 0,
+        "Combat": 1,
         "Sailing": 1,
-        "Search": 0
+        "Search": 1
       },
       "text": "Patch Them Up\n- Once per Expedition, ignore one Crew loss caused by Mission failure"
     },
@@ -1369,8 +1369,8 @@ export const DATA = {
         "height": 350
       },
       "zone": 3,
-      "test": "Combat",
-      "target": 10,
+      "test": "Combat + Sailing",
+      "target": 15,
       "text": "- Supply 8\n- Gold 8\n- Treasure 1",
       "reward": {
         "supply": 8,
@@ -1392,8 +1392,8 @@ export const DATA = {
         "height": 350
       },
       "zone": 3,
-      "test": "Combat",
-      "target": 10,
+      "test": "Combat + Search",
+      "target": 15,
       "text": "- Veteran 1\n- Supply 7\n- Gold 5",
       "reward": {
         "veteran": 1,
@@ -1416,7 +1416,7 @@ export const DATA = {
       },
       "zone": 3,
       "test": "Search",
-      "target": 10,
+      "target": 12,
       "text": "- Veteran 2\n- Supply 6",
       "reward": {
         "veteran": 2,
@@ -1438,7 +1438,7 @@ export const DATA = {
       },
       "zone": 3,
       "test": "Sailing",
-      "target": 10,
+      "target": 12,
       "text": "- Supply 12\n- Treasure 2",
       "reward": {
         "supply": 12,
@@ -1460,7 +1460,7 @@ export const DATA = {
       },
       "zone": 3,
       "test": "Combat",
-      "target": 10,
+      "target": 12,
       "text": "- Veteran 1\n- Gold 6\n- Supply 8",
       "reward": {
         "veteran": 1,
@@ -1482,8 +1482,8 @@ export const DATA = {
         "height": 350
       },
       "zone": 3,
-      "test": "Search",
-      "target": 10,
+      "test": "Search + Sailing",
+      "target": 15,
       "text": "- Supply 8\n- Gold 6\n- Draw Treasure 2, Keep 1",
       "reward": {
         "supply": 8,
@@ -1505,8 +1505,8 @@ export const DATA = {
         "height": 350
       },
       "zone": 3,
-      "test": "Sailing",
-      "target": 10,
+      "test": "Sailing + Search",
+      "target": 15,
       "text": "- Veteran 1\n- Treasure 1\n- Supply 8",
       "reward": {
         "veteran": 1,
@@ -1529,7 +1529,7 @@ export const DATA = {
       },
       "zone": 3,
       "test": "Sailing",
-      "target": 9,
+      "target": 11,
       "text": "- Supply 9\n- Veteran 1\n- Gold 8",
       "reward": {
         "supply": 9,
@@ -1552,7 +1552,7 @@ export const DATA = {
       },
       "zone": 3,
       "test": "Combat",
-      "target": 10,
+      "target": 13,
       "text": "- Veteran 2\n- Treasure 1\n- Supply 10",
       "reward": {
         "veteran": 2,
@@ -1577,14 +1577,14 @@ export const DATA = {
         {
           "name": "Fight for Coward!",
           "test": "Combat",
-          "target": 10,
-          "text": "- Test Type: Combat\n- Target: 10"
+          "target": 12,
+          "text": "- Test Type: Combat\n- Target: 12"
         },
         {
           "name": "Treasure of the LOST CITY!",
           "test": "Search",
-          "target": 15,
-          "text": "- Test Type: Search\n- Target: 15"
+          "target": 16,
+          "text": "- Test Type: Search\n- Target: 16"
         }
       ]
     },
@@ -1605,14 +1605,14 @@ export const DATA = {
         {
           "name": "Beware Whirlpool!",
           "test": "Sailing",
-          "target": 10,
-          "text": "- Test Type: Sailing\n- Target: 10"
+          "target": 12,
+          "text": "- Test Type: Sailing\n- Target: 12"
         },
         {
           "name": "Fight the Guardian!",
           "test": "Combat",
-          "target": 15,
-          "text": "- Test Type: Combat\n- Target: 15"
+          "target": 16,
+          "text": "- Test Type: Combat\n- Target: 16"
         }
       ]
     },
@@ -1633,14 +1633,14 @@ export const DATA = {
         {
           "name": "Search for your sage!",
           "test": "Search",
-          "target": 8,
-          "text": "- Pay 6 Gold\nOR discard 1 Treasure\nReward:\n- Test Type: Search \n- Target: 8"
+          "target": 10,
+          "text": "- Pay 6 Gold\nOR discard 1 Treasure\nReward:\n- Test Type: Search\n- Target: 10"
         },
         {
           "name": "Fight for your life!",
           "test": "Combat",
-          "target": 15,
-          "text": "- Test Type: Combat\n- Target: 15"
+          "target": 16,
+          "text": "- Test Type: Combat\n- Target: 16"
         }
       ]
     },
@@ -1661,14 +1661,14 @@ export const DATA = {
         {
           "name": "Sail to the Throne of OUR KING",
           "test": "Sailing",
-          "target": 8,
-          "text": "Must have all:\n- 4 Crew\n- at least 2 Veteran\n- at least 2 Treasure\n\n- Test Type: Sail\n- Target: 8"
+          "target": 10,
+          "text": "Must have all:\n- 4 Crew\n- at least 2 Veteran\n- at least 2 Treasure\n\n- Test Type: Sailing\n- Target: 10"
         },
         {
           "name": "Bring OUR PIRATE KING back!",
           "test": "Search",
-          "target": 15,
-          "text": "- Test Type: Search \n- Target: 15"
+          "target": 16,
+          "text": "- Test Type: Search\n- Target: 16"
         }
       ]
     },
@@ -1689,14 +1689,14 @@ export const DATA = {
         {
           "name": "Approach them!",
           "test": "Search",
-          "target": 8,
-          "text": "- At least 3 different Crew types\n- At least 1 Veteran\n\n- Test Type: Search \n- Target: 8"
+          "target": 10,
+          "text": "- At least 3 different Crew types\n- At least 1 Veteran\n\n- Test Type: Search\n- Target: 10"
         },
         {
           "name": "Leave them alone!",
           "test": "Sailing",
-          "target": 15,
-          "text": "- Test Type: Sailing\n- Target: 15"
+          "target": 16,
+          "text": "- Test Type: Sailing\n- Target: 16"
         }
       ]
     }
