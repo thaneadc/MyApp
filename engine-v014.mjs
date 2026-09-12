@@ -12,6 +12,9 @@ export function normalizeSharedPools(s){
  if(!Array.isArray(s.market))s.market=[...(fallback('market')||[])];
  if(!Array.isArray(s.veteranMarket))s.veteranMarket=[...(fallback('veteranMarket')||[])];
  if(!Array.isArray(s.treasureDeck))s.treasureDeck=[...(fallback('treasureDeck')||[])];
+ const hasAIRole=s.players.some(p=>Object.hasOwn(p,'isAI'));
+ if(s.mode==='ai'&&!hasAIRole)s.players.forEach((p,i)=>p.isAI=i>0);
+ if(s.mode!=='ai')s.players.forEach(p=>p.isAI=false);
  for(const p of s.players){delete p.market;delete p.veteranMarket;delete p.treasureDeck;delete p.crewDeck;delete p.veteranDeck}
  return s;
 }
@@ -26,7 +29,11 @@ export function playerZoneEligible(s,z,playerIndex=s.turn){if(z<=1)return true;c
 export function available(s,id){const c=CARDS[id];if(!c)return false;const z=c.kind==='final'?4:c.zone;if(!z||!unlocked(s,z)||!playerZoneEligible(s,z))return false;return c.kind==='final'?s.final[0]===id:s.stacks[c.zone].some(st=>st[0]===id)}
 export function newGame(setup={},rng=Math.random){
  const s={version:'0.15',nextId:1,turn:0,round:1,status:'playing',mode:setup.mode||'local',phase:'place',placed:null,location:null,workers:Object.fromEntries(Object.keys(LOCATIONS).map(l=>[l,["tavern","dock"].includes(l)?true:null])),progress:[0,0,0],stacks:{},final:[],missionDiscard:[],treasureDiscard:[],crewDiscard:[],log:[],exp:null,overflow:null,blackRefreshed:false};
- s.players=Array.from({length:Math.max(2,Math.min(4,setup.players||2))},(_,i)=>({name:setup.names?.[i]||'Player '+(i+1),portrait:setup.portraits?.[i]||null,gold:i?3:2,supply:i>=2?3:2,crew:[instance(s,'C01')],treasures:[],blessing:null}));
+ const playerCount=Math.max(2,Math.min(4,setup.players||2));
+ const seats=Array.from({length:playerCount},(_,i)=>({name:setup.names?.[i]||'Player '+(i+1),portrait:setup.portraits?.[i]||null,isAI:setup.mode==='ai'&&i>0,gold:0,supply:0,crew:[instance(s,'C01')],treasures:[],blessing:null}));
+ s.players=shuffle(seats,rng);
+ s.players.forEach((p,i)=>{p.gold=i?3:2;p.supply=i>=2?3:2});
+ s.log.unshift('Turn order: '+s.players.map(p=>p.name).join(' → '));
  s.crewDeck=shuffle(DATA.cards.filter(c=>c.kind==='crew'&&c.tier==='Common').flatMap(c=>Array(c.id==='C01'?4-s.players.length:4).fill(c.id)),rng);
  s.veteranDeck=shuffle(DATA.cards.filter(c=>c.tier==='Veteran').flatMap(c=>Array(4).fill(c.id)),rng);
  s.market=s.crewDeck.splice(0,3);s.veteranMarket=s.veteranDeck.splice(0,3);s.treasureDeck=shuffle(DATA.cards.filter(c=>c.kind==='treasure').map(c=>c.id),rng);normalizeSharedPools(s);
