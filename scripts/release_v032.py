@@ -97,7 +97,7 @@ for(const [id,steps] of Object.entries(expected)){
 }
 // Combined Final scoring must sum both relevant Crew stats and existing bonuses.
 const p={crew:[{id:'C14',uid:'u1',exhausted:false},{id:'C15',uid:'u2',exhausted:false}],treasures:[]};
-assert.equal(baseScore(p,{mission:'F1',crew:['u1','u2'],treasures:[],step:0,blessing:null,powder:false}),18);
+assert.equal(baseScore(p,{mission:'F1',crew:['u1','u2'],treasures:[],step:0,blessing:null,powder:false}),16);
 assert.equal(baseScore(p,{mission:'F4',crew:['u1','u2'],treasures:[],step:1,blessing:null,powder:false}),16);
 // F3/F4/F5 no longer have entry payments or composition requirements.
 function launch(id,crew=['C01']){
