@@ -2,7 +2,7 @@ import {DATA} from './cards-v014.js';
 export {DATA};
 export const CARDS=Object.fromEntries(DATA.cards.map(c=>[c.id,c]));
 export const SAVE_KEY='captainsDashRules015';
-export const FACES=['SKULL',0,0,1,1,2,2,'GOLD'];
+export const FACES=['SKULL',0,1,1,2,2,3,'GOLD'];
 export const LOCATIONS={tavern:'Tavern',market:'Market',dock:'Dock',work:'Harbor Work',quarters:'Crew Quarters',black:'Black Market',veteran:"Veteran’s Den",witch:'Sea Witch'};
 const must=(v,m)=>{if(!v)throw Error(m)};
 export const current=s=>s.players[s.turn];
@@ -46,18 +46,21 @@ const selected=(p,e)=>p.crew.filter(c=>e.crew.includes(c.uid));
 const count=(p,e,id)=>selected(p,e).filter(c=>c.id===id).length;
 const has=(e,id)=>e.treasures.includes(id);
 export function testInfo(e){const c=CARDS[e.mission];return c.kind==='final'?c.steps[e.step||0]:c}
-export function crewScore(p,e){const t=testInfo(e).test,z=CARDS[e.mission].zone||4;let n=selected(p,e).reduce((v,c)=>v+CARDS[c.id].stats[t],0);if(t==='Combat')n+=count(p,e,'C02')+count(p,e,'C10');if(t==='Sailing'&&z>=2)n+=count(p,e,'C03')+count(p,e,'C08');if(t==='Search')n+=count(p,e,'C11');return n}
-export function baseScore(p,e){const t=testInfo(e).test,z=CARDS[e.mission].zone||4;let n=crewScore(p,e);const bonus={Combat:{T05:2,T08:1},Sailing:{T04:2},Search:{T01:1,T02:z===4?2:1,T10:1,T12:1}};for(const [id,v]of Object.entries(bonus[t]))if(has(e,id))n+=v;if(e.blessing===t)n+=3;if(e.powder&&t==='Combat')n+=2;return n}
-export function totalScore(p,e){return baseScore(p,e)+e.dice.reduce((n,d)=>n+(typeof d==='number'?d:0),0)+(has(e,'T13')&&!e.dice.includes('SKULL')?2:0)+(testInfo(e).test==='Combat'&&count(p,e,'C15')&&e.dice.includes('GOLD')?1:0)}
+const splitTests=t=>String(t||'').split(/\s*\+\s*/).filter(Boolean);
+const hasTest=(e,t)=>splitTests(testInfo(e).test).includes(t);
+const cardHasTest=(c,t)=>splitTests(c?.test).includes(t)||c?.steps?.some(st=>splitTests(st.test).includes(t));
+export function crewScore(p,e){const tests=splitTests(testInfo(e).test),z=CARDS[e.mission].zone||4;let n=selected(p,e).reduce((v,c)=>v+tests.reduce((sum,t)=>sum+(CARDS[c.id].stats[t]||0),0),0);if(tests.includes('Combat')&&z>=2)n+=count(p,e,'C02');if(tests.includes('Sailing')&&z>=3)n+=count(p,e,'C03');if(tests.includes('Sailing')&&z>=2)n+=count(p,e,'C08');if(tests.includes('Search'))n+=count(p,e,'C11');return n}
+export function baseScore(p,e){const tests=splitTests(testInfo(e).test),z=CARDS[e.mission].zone||4;let n=crewScore(p,e);const bonus={Combat:{T05:2,T08:1},Sailing:{T04:2},Search:{T01:1,T02:z===4?2:1,T10:1,T12:1}};for(const t of tests)for(const [id,v]of Object.entries(bonus[t]||{}))if(has(e,id))n+=v;if(tests.includes(e.blessing))n+=3;if(e.powder&&tests.includes('Combat'))n+=2;return n}
+export function totalScore(p,e){return baseScore(p,e)+e.dice.reduce((n,d)=>n+(typeof d==='number'?d:0),0)+(has(e,'T13')&&!e.dice.includes('SKULL')?2:0)+(hasTest(e,'Combat')&&count(p,e,'C15')&&e.dice.includes('GOLD')?1:0)}
 export function supplyCost(p,z,treasures=p.treasures,crew=p.crew.filter(c=>!c.exhausted).map(c=>c.uid)){return Math.max(1,[1,3,6,9][z-1]-(treasures.includes('T18')?2:0)-p.crew.filter(c=>crew.includes(c.uid)&&!c.exhausted&&c.id==='C06').length)}
 function discardCrew(s,p,uid){const c=p.crew.find(c=>c.uid===uid);must(c,'Choose an owned Crew');s.crewDiscard.push(c.id);p.crew=p.crew.filter(c=>c.uid!==uid)}
 function checkCapacity(s){const p=current(s);s.overflow=p.crew.length>4?'crew':p.treasures.length>3?'treasure':null;return !!s.overflow}
 function drawTreasure(s,rng){if(!s.treasureDeck.length){s.treasureDeck=shuffle(s.treasureDiscard,rng);s.treasureDiscard=[]}return s.treasureDeck.shift()}
 function nextReward(s,rng){if(checkCapacity(s))return;const e=s.exp;if(!e)return endAction(s);const job=e.queue.shift();if(!job){e.phase='result';return}const choices=[];for(let i=0;i<job;i++){const id=drawTreasure(s,rng);if(id)choices.push(id)}if(!choices.length)return nextReward(s,rng);e.choices=choices;e.phase='treasure';}
-function resolveOutcome(s,rng){const p=current(s),e=s.exp,c=CARDS[e.mission],t=testInfo(e).test;
+function resolveOutcome(s,rng){const p=current(s),e=s.exp,c=CARDS[e.mission],t=testInfo(e).test,tests=splitTests(t);
  if(e.success){if(c.kind==='final'){s.status='won';s.winner=s.turn;e.phase='result';log(s,p.name+' wins '+c.name);return}
  const r=c.reward;p.gold+=(r.gold||0)+count(p,e,'C05')*2+count(p,e,'C11');p.supply+=r.supply||0;
- if(t==='Combat'&&has(e,'T08'))p.gold+=2;if(has(e,'T10'))p.supply++;if(t==='Search'&&c.target>=8&&has(e,'T12'))p.gold+=2;if(has(e,'T17'))p.gold+=2;if(has(e,'T20'))p.gold+=3;
+ if(tests.includes('Combat')&&has(e,'T08'))p.gold+=2;if(has(e,'T10'))p.supply++;if(tests.includes('Search')&&c.target>=8&&has(e,'T12'))p.gold+=2;if(has(e,'T17'))p.gold+=2;if(has(e,'T20'))p.gold+=3;
  if(count(p,e,'C14')){const x=p.crew.find(c=>c.exhausted);if(x)x.exhausted=false}
  for(const [key,deck] of [['crew','crewDeck'],['veteran','veteranDeck']])for(let i=0;i<(r[key]||0);i++){const id=s[deck].shift();if(id)p.crew.push(instance(s,id))}
  for(let i=0;i<(r.treasure||0);i++)e.queue.push(count(p,e,'C09')?2:1);if(r.drawTreasure)e.queue.push(2);
@@ -66,8 +69,8 @@ function resolveOutcome(s,rng){const p=current(s),e=s.exp,c=CARDS[e.mission],t=t
  log(s,`${p.name}: ${c.name} — ${e.success?'SUCCESS':'FAIL'} (${e.total} ${t})`);nextReward(s,rng);
 }
 function checkResult(s,rng){const p=current(s),e=s.exp;e.total=totalScore(p,e);e.success=!e.dice.includes('SKULL')&&e.total>=testInfo(e).target;if(e.success&&CARDS[e.mission].kind==='final'&&e.step===0){log(s,p.name+' passed Final Step 1');e.firstDice=[...e.dice];e.step=1;e.phase='ready';e.dice=[];e.used=[];e.awarded={};e.success=null;return}if(!e.success){e.phase='loss';return}resolveOutcome(s,rng)}
-function awardDice(p,e,newFaces){p.gold+=newFaces.filter(d=>d==='GOLD').length*(has(e,'T09')?2:1);e.awarded||={};if(testInfo(e).test==='Combat'&&has(e,'T06')&&e.dice.includes(2)&&!e.awarded.T06){p.gold++;e.awarded.T06=true}if(has(e,'T16')&&e.dice.includes('SKULL')&&e.dice.includes('GOLD')&&!e.awarded.T16){p.gold++;e.awarded.T16=true}}
-export function controls(s){const e=s.exp;if(!e||e.phase!=='dice'||e.dice.includes('SKULL'))return [];const p=current(s),t=testInfo(e).test,opts=[];if(e.dice.includes(0)){for(const c of selected(p,e))if((c.id==='C04'&&t==='Search'||c.id==='C07'&&t==='Combat')&&!e.used.includes(c.uid))opts.push({id:c.uid,label:CARDS[c.id].name+' · reroll a 0'});if(has(e,'T14')&&!e.used.includes('T14'))opts.push({id:'T14',label:'Loaded Bones · 0 → 1'})}if(e.blessing==='fortune'&&!e.fortuneUsed)opts.push({id:'fortune',label:'Fortune · reroll one die'});return opts}
+function awardDice(p,e,newFaces){p.gold+=newFaces.filter(d=>d==='GOLD').length*(has(e,'T09')?2:1);e.awarded||={};if(hasTest(e,'Combat')&&has(e,'T06')&&e.dice.includes(2)&&!e.awarded.T06){p.gold++;e.awarded.T06=true}if(has(e,'T16')&&e.dice.includes('SKULL')&&e.dice.includes('GOLD')&&!e.awarded.T16){p.gold++;e.awarded.T16=true}}
+export function controls(s){const e=s.exp;if(!e||e.phase!=='dice'||e.dice.includes('SKULL'))return [];const p=current(s),tests=splitTests(testInfo(e).test),opts=[];if(e.dice.includes(0)){for(const c of selected(p,e))if((c.id==='C04'&&tests.includes('Search')||c.id==='C07'&&tests.includes('Combat'))&&!e.used.includes(c.uid))opts.push({id:c.uid,label:CARDS[c.id].name+' · reroll a 0'});if(has(e,'T14')&&!e.used.includes('T14'))opts.push({id:'T14',label:'Loaded Bones · 0 → 1'})}if(e.blessing==='fortune'&&!e.fortuneUsed)opts.push({id:'fortune',label:'Fortune · reroll one die'});return opts}
 export function act(original,a,rng=Math.random){const s=normalizeSharedPools(structuredClone(original)),p=current(s),e=s.exp;must(s.version==='0.15'&&s.status==='playing','Start a v0.15 voyage');
  if(s.overflow){must(a.type==='discardOwned','Choose a card to discard first');if(s.overflow==='crew')discardCrew(s,p,a.id);else{must(p.treasures.includes(a.id),'Choose owned Treasure');p.treasures.splice(p.treasures.indexOf(a.id),1);s.treasureDiscard.push(a.id)}if(!checkCapacity(s)){if(e)nextReward(s,rng);else endAction(s)}return s}
  if(a.type==='worker'){must(legalWorker(s,a.location),'Choose a legal location: take a shared Pirate from another location, never the just-placed Pirate');s.location=a.location;if(s.phase==='place'){s.workers[a.location]=true;s.placed=a.location}else s.workers[a.location]=null;return s}
@@ -87,7 +90,7 @@ export function act(original,a,rng=Math.random){const s=normalizeSharedPools(str
  const crew=selected(p,exp),vet=crew.filter(c=>CARDS[c.id].tier==='Veteran').length;
  if(c.id==='F4')must(crew.length===4&&vet>=2&&p.treasures.length>=2,'Requires 4 Crew, 2 Veterans and 2 Treasures');if(c.id==='F5')must(new Set(crew.map(c=>c.id)).size>=3&&vet>=1,'Requires 3 different Crew types and 1 Veteran');
  let gold=0;if(c.id==='F3'){if(a.payment==='treasure'){must(p.treasures.includes(a.sacrifice),'Choose Treasure to discard');p.treasures=p.treasures.filter(id=>id!==a.sacrifice);exp.treasures=[...p.treasures];s.treasureDiscard.push(a.sacrifice)}else gold=6}
- if(a.powder)must(has(exp,'T07')&&(c.test==='Combat'||c.steps?.some(st=>st.test==='Combat')),'Black Powder Horn requires a Combat test');
+ if(a.powder)must(has(exp,'T07')&&cardHasTest(c,'Combat'),'Black Powder Horn requires a Combat test');
  const cost=supplyCost(p,z,exp.treasures,a.crew)+(a.powder?1:0);must(p.gold>=gold&&p.supply>=cost,'Not enough Gold or Supply');p.gold-=gold;p.supply-=cost;for(const x of p.crew)if(a.crew.includes(x.uid))x.exhausted=true;exp.paid=cost;p.blessing=null;s.exp=exp;return s;
  }
  if(a.type==='work'){must(loc==='work','Use Harbor Work');p.gold+=3}

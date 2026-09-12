@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import {DATA,CARDS,newGame,current,act,unlocked,legalWorker,baseScore,supplyCost,controls} from '../engine-v014.mjs';
 let checks=0;const eq=(a,b)=>{assert.deepEqual(a,b);checks++},throws=(f)=>{assert.throws(f);checks++};
 eq(DATA.cards.length,81);eq(DATA.cards.filter(c=>c.kind==='final').length,5);
-for(const c of DATA.cards){if(c.kind==='crew')eq(Object.keys(c.stats),['Combat','Sailing','Search']);if(c.zone)assert(['Combat','Sailing','Search'].includes(c.test));}
+for(const c of DATA.cards){if(c.kind==='crew')eq(Object.keys(c.stats),['Combat','Sailing','Search']);if(c.zone)assert(c.test.split(/\s*\+\s*/).every(t=>['Combat','Sailing','Search'].includes(t)));}
 for(const n of [2,3,4]){const s=newGame({players:n});eq(s.market.length,3);eq(s.veteranMarket.length,3);eq(s.final.length,3);eq(s.players.map(p=>[p.gold,p.supply,p.crew.length]),[[2,2,1],[3,2,1],[3,3,1],[3,3,1]].slice(0,n));eq(unlocked(s,2),n===2);eq(Object.values(s.stacks).map(a=>a.map(st=>st.length)),[[2,2,2],[2,2,2],[2,2]]);}
 let s;
 for(const n of [2,3,4]){
@@ -17,7 +17,7 @@ for(const n of [2,3,4]){
  }
 }
 function expedition(id='Z1-01',crew=['C02'],treasures=[]){let s=newGame();const p=current(s);p.gold=30;p.supply=30;p.crew=crew.map((id,i)=>({id,uid:'test'+i,exhausted:false}));p.treasures=treasures;s.progress=[2,2,1];const zone=id.startsWith('F')?4:+id[1];for(let prev=1;prev<zone;prev++){const prior=DATA.cards.find(c=>c.zone===prev)?.id;if(prior)s.missionDiscard.unshift({id:prior,player:p.name,playerIndex:s.turn,result:'success'})}if(id.startsWith('F'))s.final=[id];else s.stacks[+id[1]][0]=[id];s.workers.dock=null;s=act(s,{type:'worker',location:'dock'});return act(s,{type:'launch',mission:id,crew:p.crew.map(c=>c.uid)})}
-let e=expedition();eq(baseScore(current(e),e.exp),4);e=act(e,{type:'roll'},()=>.2);e=act(e,{type:'resolve'});eq(e.exp.success,true);eq(current(e).gold,35);eq(e.progress[0],3);
+let e=expedition();eq(baseScore(current(e),e.exp),3);e=act(e,{type:'roll'},()=>.2);e=act(e,{type:'resolve'});eq(e.exp.success,true);eq(current(e).gold,35);eq(e.progress[0],3);
 e=expedition('Z1-03',['C02']);eq(baseScore(current(e),e.exp),0);e=act(e,{type:'roll'},()=>.2);e=act(e,{type:'resolve'});eq(e.exp.phase,'loss');e=act(e,{type:'loss',id:'test0'});eq(current(e).crew.length,0);eq(e.stacks[1][0][0],'Z1-03');
 e=expedition('Z2-01',['C02'],['T09']);let values=[0,.99];e=act(e,{type:'roll'},()=>values.shift());eq(e.exp.phase,'loss');eq(current(e).gold,32);eq(controls(e),[]);throws(()=>act(e,{type:'control',id:'fortune',index:0}));
 e=expedition('Z1-02',['C04']);e=act(e,{type:'roll'},()=>.2);eq(controls(e).length,1);e=act(e,{type:'control',id:'test0'},()=>0);eq(e.exp.phase,'loss');
