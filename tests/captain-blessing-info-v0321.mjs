@@ -1,0 +1,10 @@
+import assert from 'node:assert/strict';
+import {readFileSync} from 'node:fs';
+const ui=readFileSync(new URL('../voyage-v014.js',import.meta.url),'utf8');
+assert.match(ui,/Sea Witch Blessing/,'Captain Information should show Blessing status');
+assert.match(ui,/No active Blessing/,'Captain Information should show empty Blessing state');
+assert.match(ui,/Fortune · reroll 1 non-Skull die/,'Captain Information should describe Fortune');
+assert.match(ui,/p\.blessing\?\'\+3 \'\+p\.blessing/,'Captain Information should show +3 stat blessings');
+const dockBlock=ui.match(/function playerDock\(\)\{[\s\S]*?function render\(/)?.[0]||'';
+assert.doesNotMatch(dockBlock,/Sea Witch Blessing|No active Blessing/,'Blessing info should not be added to the right-side player panel');
+console.log('Captain Blessing information regression passed');
