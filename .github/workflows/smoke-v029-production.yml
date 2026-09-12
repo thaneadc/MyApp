@@ -1,0 +1,32 @@
+name: Smoke Test Captain's Dash v0.29 Production
+
+on:
+  push:
+    branches: ['release/v0.29']
+    paths:
+      - '.github/workflows/smoke-v029-production.yml'
+  workflow_dispatch:
+
+jobs:
+  smoke-v029:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Verify production v0.29
+        shell: bash
+        run: |
+          set -euo pipefail
+          BASE='https://captains-dash-the-final-isle.vercel.app'
+          curl -fsSL --retry 5 --retry-delay 2 "$BASE/" -o /tmp/index.html
+          grep -q 'v0.29 TEST' /tmp/index.html
+          curl -fsSL --retry 5 --retry-delay 2 "$BASE/menu.js" -o /tmp/menu.js
+          grep -q 'portraitOptions' /tmp/menu.js
+          grep -q 'cyclePortrait' /tmp/menu.js
+          grep -q 'captain-user-06.webp' /tmp/menu.js
+          curl -fsSL --retry 5 --retry-delay 2 "$BASE/voyage-v014.js" -o /tmp/voyage.js
+          grep -q 'if(!p.portrait)p.portrait=' /tmp/voyage.js
+          for i in 01 02 03 04 05 06; do
+            curl -fsSL --retry 5 --retry-delay 2 "$BASE/assets/captain-user-${i}.webp" -o "/tmp/captain-${i}.webp"
+            test "$(head -c 4 "/tmp/captain-${i}.webp")" = 'RIFF'
+            test "$(dd if="/tmp/captain-${i}.webp" bs=1 skip=8 count=4 status=none)" = 'WEBP'
+          done
+          echo 'v0.29 production smoke passed'
