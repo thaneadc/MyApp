@@ -1,0 +1,74 @@
+name: Add Veteran purple ribbon v0.32.1
+
+on:
+  push:
+    branches: ['ui/veteran-purple-ribbon']
+    paths:
+      - 'scripts/add_veteran_purple_ribbon_v0321.py'
+      - 'tests/veteran-purple-ribbon-v0321.mjs'
+      - '.github/workflows/add-veteran-purple-ribbon-v0321.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  veteran-purple-ribbon:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout UI branch
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Apply Veteran ribbon patch
+        run: python3 scripts/add_veteran_purple_ribbon_v0321.py
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: JavaScript syntax checks
+        run: |
+          node --check voyage-v014.js
+          node --check engine-v014.mjs
+
+      - name: Core rules regression
+        run: npm test
+
+      - name: v0.32 Final rules regression
+        run: node tests/rules-v032.mjs
+
+      - name: AI Final strategy regression
+        run: node tests/ai-zone3-final-v032.mjs
+
+      - name: Captain Blessing regression
+        run: node tests/captain-blessing-info-v0321.mjs
+
+      - name: UI and AI pacing regression
+        run: node tests/ui-ai-pacing-public-info-v0321.mjs
+
+      - name: Veteran ribbon regression
+        run: node tests/veteran-purple-ribbon-v0321.mjs
+
+      - name: Build production bundle
+        run: npm run build
+
+      - name: Verify built Veteran ribbon
+        shell: bash
+        run: |
+          set -euo pipefail
+          grep -q 'physicalCard.crew.veteran .cardRibbon' dist/voyage-table.css
+          grep -q "c.tier.toLowerCase" dist/voyage-v014.js
+
+      - name: Commit Veteran ribbon change
+        shell: bash
+        run: |
+          git config user.name "captains-dash-build-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add voyage-v014.js voyage-table.css
+          if git diff --cached --quiet; then
+            echo "Veteran ribbon change already committed"
+          else
+            git commit -m "Style Veteran Crew ribbon purple"
+            git push origin HEAD:ui/veteran-purple-ribbon
+          fi
