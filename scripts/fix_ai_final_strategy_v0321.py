@@ -20,6 +20,11 @@ p.write_text(s.replace(old,new),encoding='utf-8')
 # Extend v0.32 AI regression to guard two-step evaluation + strategic blessing.
 t=ROOT/'tests/ai-zone3-final-v032.mjs'
 r=t.read_text(encoding='utf-8')
+old_guard="assert(ui.includes(\"target-((c.zone||4)>=3?4:2)\"),'Zone III/Final should allow up to 4 dice power gap');"
+new_guard="assert(ui.includes(\"gap=z>=3?4:2\"),'Zone III/Final should retain the 4-point late-game dice gap');"
+if old_guard not in r:
+    raise SystemExit('old AI threshold regression guard not found')
+r=r.replace(old_guard,new_guard)
 marker="assert(!engine.includes(\"c.id==='F3'\"));\n"
 extra="""assert(ui.includes('const aiMissionViable='),'AI should centralize mission viability');
 assert(ui.includes("c.kind==='final')return c.steps.every"),'Final viability must evaluate every step');
