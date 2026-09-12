@@ -158,7 +158,7 @@
 
   function currentSetup() {
     return {
-      version:"0.31",
+      version:"0.32",
       players:count,
       names:[...document.querySelectorAll("#names input")].map(x=>x.value.trim()||"Captain"),
       captains:captainNames.slice(0,count),

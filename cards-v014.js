@@ -1,5 +1,5 @@
 export const DATA = {
-  "version": "0.31 Master Rules",
+  "version": "0.32 Master Rules",
   "cards": [
     {
       "id": "C01",
@@ -1576,9 +1576,9 @@ export const DATA = {
       "steps": [
         {
           "name": "Fight for Coward!",
-          "test": "Combat",
-          "target": 12,
-          "text": "- Test Type: Combat\n- Target: 12"
+          "test": "Combat + Sailing",
+          "target": 18,
+          "text": "- Test Type: Combat + Sailing\n- Target: 18"
         },
         {
           "name": "Treasure of the LOST CITY!",
@@ -1633,8 +1633,8 @@ export const DATA = {
         {
           "name": "Search for your sage!",
           "test": "Search",
-          "target": 10,
-          "text": "- Pay 6 Gold\nOR discard 1 Treasure\nReward:\n- Test Type: Search\n- Target: 10"
+          "target": 12,
+          "text": "- Test Type: Search\n- Target: 12"
         },
         {
           "name": "Fight for your life!",
@@ -1661,14 +1661,14 @@ export const DATA = {
         {
           "name": "Sail to the Throne of OUR KING",
           "test": "Sailing",
-          "target": 10,
-          "text": "Must have all:\n- 4 Crew\n- at least 2 Veteran\n- at least 2 Treasure\n\n- Test Type: Sailing\n- Target: 10"
+          "target": 12,
+          "text": "- Test Type: Sailing\n- Target: 12"
         },
         {
           "name": "Bring OUR PIRATE KING back!",
-          "test": "Search",
-          "target": 16,
-          "text": "- Test Type: Search\n- Target: 16"
+          "test": "Search + Combat",
+          "target": 22,
+          "text": "- Test Type: Search + Combat\n- Target: 22"
         }
       ]
     },
@@ -1689,14 +1689,14 @@ export const DATA = {
         {
           "name": "Approach them!",
           "test": "Search",
-          "target": 10,
-          "text": "- At least 3 different Crew types\n- At least 1 Veteran\n\n- Test Type: Search\n- Target: 10"
+          "target": 11,
+          "text": "- Test Type: Search\n- Target: 11"
         },
         {
           "name": "Leave them alone!",
-          "test": "Sailing",
-          "target": 16,
-          "text": "- Test Type: Sailing\n- Target: 16"
+          "test": "Sailing + Combat",
+          "target": 22,
+          "text": "- Test Type: Sailing + Combat\n- Target: 22"
         }
       ]
     }
