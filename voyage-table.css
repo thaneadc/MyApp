@@ -178,3 +178,11 @@
 
 /* v0.32.1 — keep Crew names readable on the failure discard screen. */
 .expDiscardGrid .physicalCard h3{color:#000!important}
+
+/* v0.32.1 — Veteran Crew ribbon */
+.physicalCard.crew.veteran .cardRibbon{
+  background:linear-gradient(#74458f,#4a285f);
+  border-block-color:#c7a2d7;
+  color:#fff0ff;
+  box-shadow:inset 0 0 0 1px #e4c9ee22;
+}
