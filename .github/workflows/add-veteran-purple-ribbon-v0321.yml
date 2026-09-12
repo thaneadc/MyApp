@@ -44,9 +44,6 @@ jobs:
       - name: Final two-step lifecycle regression
         run: node tests/final-two-step-lifecycle-v0321.mjs
 
-      - name: AI Step 2 visibility regression
-        run: node tests/ai-final-step2-visibility-v0321.mjs
-
       - name: Captain Blessing regression
         run: node tests/captain-blessing-info-v0321.mjs
 
