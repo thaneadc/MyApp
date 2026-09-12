@@ -20,7 +20,7 @@ assert.equal(available(s,finalId),true,'globally unlocked Final must be availabl
 const ui=readFileSync(new URL('../voyage-v014.js',import.meta.url),'utf8');
 const engine=readFileSync(new URL('../engine-v014.mjs',import.meta.url),'utf8');
 assert(!ui.includes('baseScore(p,e)>=testInfo(e).target-2'),'old over-conservative threshold must stay removed');
-assert(ui.includes("target-((c.zone||4)>=3?4:2)"),'Zone III/Final should allow up to 4 dice power gap');
+assert(ui.includes("gap=z>=3?4:2"),'Zone III/Final should retain the 4-point late-game dice gap');
 assert(ui.includes("tired&&(unlocked(state,3)||ready<=1)"),'late-game AI should recover exhausted crew before docking');
 // v0.32 removes the special F3 payment and F4/F5 composition gates for both humans and AI.
 assert(!ui.includes("id!=='F3'||p.gold>=6||p.treasures.length"));
@@ -30,5 +30,12 @@ assert(!ui.includes("id!=='F5'||new Set"));
 assert(!engine.includes('Requires 4 Crew, 2 Veterans and 2 Treasures'));
 assert(!engine.includes('Requires 3 different Crew types and 1 Veteran'));
 assert(!engine.includes("c.id==='F3'"));
+assert(ui.includes('const aiMissionViable='),'AI should centralize mission viability');
+assert(ui.includes("c.kind==='final')return c.steps.every"),'Final viability must evaluate every step');
+assert(ui.includes('aiMissionMargin(p,id,crew,blessing,step)'),'Final evaluation must score each step separately');
+assert(ui.includes('const aiBestFinalBlessing='),'AI should choose a Final blessing strategically');
+assert(ui.includes("shouldBless=unlocked(state,4)&&!p.blessing&&p.gold>=3"),'AI should prioritize Sea Witch before a viable Final attempt');
+assert(ui.includes("else if(l==='witch')"),'AI must actually resolve the Sea Witch action');
+assert(ui.includes("{type:'bless',id:choice.blessing}"),'AI must select and buy its chosen blessing');
 
 console.log('AI Zone III / Final v0.32 regression passed');
