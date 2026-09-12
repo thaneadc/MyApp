@@ -1,0 +1,66 @@
+name: Fix AI Final two-step strategy v0.32.1
+
+on:
+  push:
+    branches: ['fix/ai-final-two-step-eval']
+    paths:
+      - 'scripts/fix_ai_final_strategy_v0321.py'
+      - '.github/workflows/fix-ai-final-strategy-v0321.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  fix-ai-final-strategy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout fix branch
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Apply AI Final strategy patch
+        run: python3 scripts/fix_ai_final_strategy_v0321.py
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: JavaScript syntax checks
+        run: |
+          node --check voyage-v014.js
+          node --check engine-v014.mjs
+
+      - name: Core rules regression
+        run: npm test
+
+      - name: v0.32 Final rules regression
+        run: node tests/rules-v032.mjs
+
+      - name: AI Final strategy regression
+        run: node tests/ai-zone3-final-v032.mjs
+
+      - name: Build production bundle
+        run: npm run build
+
+      - name: Verify built AI strategy
+        shell: bash
+        run: |
+          set -euo pipefail
+          grep -q "c.kind==='final')return c.steps.every" dist/voyage-v014.js
+          grep -q "const aiBestFinalBlessing=" dist/voyage-v014.js
+          grep -q "else if(l==='witch')" dist/voyage-v014.js
+          grep -q "type:'bless'" dist/voyage-v014.js
+
+      - name: Commit AI Final strategy fix
+        shell: bash
+        run: |
+          git config user.name "captains-dash-build-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add voyage-v014.js tests/ai-zone3-final-v032.mjs
+          if git diff --cached --quiet; then
+            echo "AI Final strategy already committed"
+          else
+            git commit -m "Evaluate both Final steps and use Sea Witch blessing"
+            git push origin HEAD:fix/ai-final-two-step-eval
+          fi
