@@ -1,0 +1,72 @@
+name: Build Captain's Dash v0.28
+
+on:
+  push:
+    branches: ['release/v0.28']
+    paths:
+      - 'scripts/release_v028.py'
+      - '.github/workflows/release-v028.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build-v028:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout release branch
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Apply randomized turn order
+        run: python3 scripts/release_v028.py
+
+      - name: Set package version
+        run: npm version 0.28.0 --no-git-tag-version
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: JavaScript syntax checks
+        run: |
+          node --check menu.js
+          node --check voyage-v014.js
+          node --check engine-v014.mjs
+
+      - name: Core rules regression
+        run: npm test
+
+      - name: v0.28 player-order regression
+        run: node tests/rules-v028.mjs
+
+      - name: Build release
+        run: npm run build
+
+      - name: Verify built v0.28 output
+        shell: bash
+        run: |
+          set -euo pipefail
+          grep -q 'v0.28 TEST' dist/index.html
+          grep -q 'Turn order:' dist/engine-v014.mjs
+          grep -q 'isAI' dist/engine-v014.mjs
+          grep -q 'current(state)?.isAI' dist/voyage-v014.js
+          grep -q '014ea26d527fb00d.jpg' dist/menu.js
+          ! grep -q 'randomPortraitSet' dist/menu.js
+          ! grep -q 'cyclePortrait(' dist/menu.js
+          grep -q 'captains-dash-final-clean-v3.ogg' dist/menu.js
+          grep -q 'captains-dash-victory-v2.ogg' dist/menu.js
+
+      - name: Commit v0.28 implementation
+        shell: bash
+        run: |
+          git config user.name "captains-dash-build-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add engine-v014.mjs voyage-v014.js menu.js index.html tests/rules-v028.mjs package.json package-lock.json
+          if git diff --cached --quiet; then
+            echo "v0.28 implementation already committed"
+          else
+            git commit -m "Release v0.28 randomized player order"
+            git push origin HEAD:release/v0.28
+          fi
