@@ -1,0 +1,66 @@
+name: Fix AI Zone III and Final v0.30.1
+
+on:
+  push:
+    branches: ['fix/ai-zone3-final']
+    paths:
+      - 'scripts/fix_ai_zone3_final_v0301.py'
+      - '.github/workflows/fix-ai-zone3-final-v0301.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  fix-ai-late-game:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout bugfix branch
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Apply AI Zone III and Final bugfix
+        run: python3 scripts/fix_ai_zone3_final_v0301.py
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: JavaScript syntax checks
+        run: |
+          node --check engine-v014.mjs
+          node --check voyage-v014.js
+          node --check tests/ai-zone3-final-v0301.mjs
+
+      - name: Core rules regression
+        run: npm test
+
+      - name: v0.30 Master Rule regression
+        run: node tests/rules-v030.mjs
+
+      - name: AI Zone III and Final regression
+        run: node tests/ai-zone3-final-v0301.mjs
+
+      - name: Build production bundle
+        run: npm run build
+
+      - name: Verify built bugfix
+        shell: bash
+        run: |
+          set -euo pipefail
+          grep -q "playerZoneEligible(s,z,playerIndex=s.turn){return unlocked(s,z)}" dist/engine-v014.mjs
+          grep -q "target-((c.zone||4)>=3?4:2)" dist/voyage-v014.js
+          grep -q "a.payment='treasure';a.sacrifice=p.treasures\[0\]" dist/voyage-v014.js
+
+      - name: Commit bugfix implementation
+        shell: bash
+        run: |
+          git config user.name "captains-dash-build-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add engine-v014.mjs voyage-v014.js tests/ai-zone3-final-v0301.mjs
+          if git diff --cached --quiet; then
+            echo "AI bugfix already committed"
+          else
+            git commit -m "Fix AI Zone III and Final mission progression"
+            git push origin HEAD:fix/ai-zone3-final
+          fi
