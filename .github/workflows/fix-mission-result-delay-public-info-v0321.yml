@@ -1,0 +1,74 @@
+name: Fix mission result pacing and public Captain info v0.32.1
+
+on:
+  push:
+    branches: ['fix/mission-result-delay-public-captain-info']
+    paths:
+      - 'scripts/fix_mission_result_delay_public_captain_info_v0321.py'
+      - 'tests/ui-ai-delay-public-info-v0321.mjs'
+      - '.github/workflows/fix-mission-result-delay-public-info-v0321.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  fix-ui-ai-pacing:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout fix branch
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Apply requested fixes
+        run: python3 scripts/fix_mission_result_delay_public_captain_info_v0321.py
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: JavaScript syntax checks
+        run: |
+          node --check voyage-v014.js
+          node --check engine-v014.mjs
+
+      - name: Core rules regression
+        run: npm test
+
+      - name: v0.32 Final rules regression
+        run: node tests/rules-v032.mjs
+
+      - name: AI Final strategy regression
+        run: node tests/ai-zone3-final-v032.mjs
+
+      - name: Captain Blessing info regression
+        run: node tests/captain-blessing-info-v0321.mjs
+
+      - name: Requested UI and AI pacing regression
+        run: node tests/ui-ai-delay-public-info-v0321.mjs
+
+      - name: Build production bundle
+        run: npm run build
+
+      - name: Verify built changes
+        shell: bash
+        run: |
+          set -euo pipefail
+          grep -q "aiDelayOverride=isFinal?4000:3050" dist/voyage-v014.js
+          grep -q "aiDelayOverride=3800" dist/voyage-v014.js
+          grep -q "View captain" dist/voyage-v014.js
+          grep -q ".expDiscardGrid .physicalCard h3{color:#000!important}" dist/voyage-table.css
+          ! grep -q "This captain’s cards are private" dist/voyage-v014.js
+
+      - name: Commit requested fixes
+        shell: bash
+        run: |
+          git config user.name "captains-dash-build-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add voyage-v014.js voyage-table.css
+          if git diff --cached --quiet; then
+            echo "Requested fixes already committed"
+          else
+            git commit -m "Improve loss readability AI pacing and Captain info access"
+            git push origin HEAD:fix/mission-result-delay-public-captain-info
+          fi
