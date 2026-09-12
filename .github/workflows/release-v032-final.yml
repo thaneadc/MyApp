@@ -5,6 +5,7 @@ on:
     branches: ['release/v0.32-final']
     paths:
       - 'scripts/release_v032.py'
+      - 'tests/ai-zone3-final-v032.mjs'
       - '.github/workflows/release-v032-final.yml'
   workflow_dispatch:
 
@@ -39,8 +40,8 @@ jobs:
       - name: Core rules regression
         run: npm test
 
-      - name: Preserve AI late-game regression
-        run: node tests/ai-zone3-final-v0301.mjs
+      - name: Preserve AI late-game regression under v0.32
+        run: node tests/ai-zone3-final-v032.mjs
 
       - name: v0.32 Final Mission regression
         run: node tests/rules-v032.mjs
