@@ -28,7 +28,7 @@ e=expedition('Z3-01',['C06'],['T18']);eq(e.exp.paid,3);eq(supplyCost(current(e),
 e=expedition('F1',['C14','C14','C14','C14']);eq(e.exp.paid,9);e=act(e,{type:'roll'},()=>.2);e=act(e,{type:'resolve'});eq(e.exp.step,1);eq(e.status,'playing');eq(e.exp.phase,'ready');eq(current(e).supply,21);eq(baseScore(current(e),e.exp),16);e=act(e,{type:'roll'},()=>.2);e=act(e,{type:'resolve'});eq(e.status,'won');
 e=expedition('F1',['C14','C14','C14','C14']);e=act(e,{type:'roll'},()=>.2);e=act(e,{type:'resolve'});e=act(e,{type:'roll'},()=>0);e=act(e,{type:'loss',id:'test0'});eq(e.final,['F1']);eq(e.status,'playing');
 e=expedition('F1',['C01']);e.final=['F1','F2','F3'];e=act(e,{type:'roll'},()=>0);e=act(e,{type:'loss',id:'test0'});eq(e.final,['F2','F3']);
-throws(()=>expedition('F4',['C01']));throws(()=>expedition('F5',['C14','C14','C14']));e=expedition('F3',['C14']);eq(current(e).gold,24);
+e=expedition('F4',['C01']);eq(e.exp.mission,'F4');e=expedition('F5',['C01']);eq(e.exp.mission,'F5');e=expedition('F3',['C14']);eq(current(e).gold,30);
 s=newGame();s.progress=[2,1,0];eq(legalWorker(s,'black'),true);eq(legalWorker(s,'veteran'),false);s.progress[1]=2;eq(legalWorker(s,'veteran'),true);eq(unlocked(s,3),true);
 s=newGame();s.workers.tavern=null;current(s).gold=30;current(s).crew=Array.from({length:4},(_,i)=>({id:'C01',uid:'x'+i,exhausted:false}));s=act(s,{type:'worker',location:'tavern'});s=act(s,{type:'recruit',id:s.market[0]});eq(s.overflow,'crew');throws(()=>act(s,{type:'worker',location:'work'}));s=act(s,{type:'discardOwned',id:'x0'});eq(current(s).crew.length,4);eq(s.players[0].crew.length,4);eq(s.turn,0);eq(s.phase,'take');
 // Save/resume keeps the paid Expedition and the intermediate worker phase.

@@ -87,9 +87,8 @@ export function act(original,a,rng=Math.random){const s=normalizeSharedPools(str
  if(a.type==='launch'){
  must(loc==='dock'&&available(s,a.mission),'Use Dock and choose an available Mission');must(Array.isArray(a.crew)&&a.crew.length>0&&a.crew.length<=4&&new Set(a.crew).size===a.crew.length&&a.crew.every(uid=>p.crew.some(c=>c.uid===uid&&!c.exhausted)),'Select 1–4 ready Crew');
  const c=CARDS[a.mission],z=c.zone||4,exp={mission:c.id,crew:a.crew,treasures:[...p.treasures],step:0,phase:'ready',dice:[],queue:[],used:[],awarded:{},blessing:p.blessing,powder:!!a.powder,fortuneUsed:false};
- const crew=selected(p,exp),vet=crew.filter(c=>CARDS[c.id].tier==='Veteran').length;
- if(c.id==='F4')must(crew.length===4&&vet>=2&&p.treasures.length>=2,'Requires 4 Crew, 2 Veterans and 2 Treasures');if(c.id==='F5')must(new Set(crew.map(c=>c.id)).size>=3&&vet>=1,'Requires 3 different Crew types and 1 Veteran');
- let gold=0;if(c.id==='F3'){if(a.payment==='treasure'){must(p.treasures.includes(a.sacrifice),'Choose Treasure to discard');p.treasures=p.treasures.filter(id=>id!==a.sacrifice);exp.treasures=[...p.treasures];s.treasureDiscard.push(a.sacrifice)}else gold=6}
+ const crew=selected(p,exp);
+ let gold=0;
  if(a.powder)must(has(exp,'T07')&&cardHasTest(c,'Combat'),'Black Powder Horn requires a Combat test');
  const cost=supplyCost(p,z,exp.treasures,a.crew)+(a.powder?1:0);must(p.gold>=gold&&p.supply>=cost,'Not enough Gold or Supply');p.gold-=gold;p.supply-=cost;for(const x of p.crew)if(a.crew.includes(x.uid))x.exhausted=true;exp.paid=cost;p.blessing=null;s.exp=exp;return s;
  }
