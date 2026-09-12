@@ -1,5 +1,5 @@
 export const DATA = {
-  "version": "0.30 Master Rules",
+  "version": "0.31 Master Rules",
   "cards": [
     {
       "id": "C01",
@@ -125,7 +125,7 @@ export const DATA = {
         "height": 209
       },
       "tier": "Veteran",
-      "cost": 6,
+      "cost": 7,
       "stats": {
         "Combat": 3,
         "Sailing": 4,
@@ -325,7 +325,7 @@ export const DATA = {
       "tier": "Veteran",
       "cost": 8,
       "stats": {
-        "Combat": 6,
+        "Combat": 5,
         "Sailing": 3,
         "Search": 3
       },
@@ -1370,7 +1370,7 @@ export const DATA = {
       },
       "zone": 3,
       "test": "Combat + Sailing",
-      "target": 15,
+      "target": 16,
       "text": "- Supply 8\n- Gold 8\n- Treasure 1",
       "reward": {
         "supply": 8,
@@ -1393,7 +1393,7 @@ export const DATA = {
       },
       "zone": 3,
       "test": "Combat + Search",
-      "target": 15,
+      "target": 16,
       "text": "- Veteran 1\n- Supply 7\n- Gold 5",
       "reward": {
         "veteran": 1,
@@ -1483,7 +1483,7 @@ export const DATA = {
       },
       "zone": 3,
       "test": "Search + Sailing",
-      "target": 15,
+      "target": 16,
       "text": "- Supply 8\n- Gold 6\n- Draw Treasure 2, Keep 1",
       "reward": {
         "supply": 8,
@@ -1506,7 +1506,7 @@ export const DATA = {
       },
       "zone": 3,
       "test": "Sailing + Search",
-      "target": 15,
+      "target": 16,
       "text": "- Veteran 1\n- Treasure 1\n- Supply 8",
       "reward": {
         "veteran": 1,

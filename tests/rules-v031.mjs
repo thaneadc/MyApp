@@ -1,0 +1,13 @@
+import assert from 'node:assert/strict';
+import {DATA,CARDS,FACES} from '../engine-v014.mjs';
+assert.equal(DATA.version,'0.31 Master Rules');
+assert.deepEqual(FACES,['SKULL',0,0,1,1,2,2,'GOLD']);
+assert.equal(CARDS.C06.cost,7);
+assert.equal(CARDS.C15.stats.Combat,5);
+for(const id of ['Z3-01','Z3-02','Z3-06','Z3-07']) assert.equal(CARDS[id].target,16,id+' target');
+assert.equal(CARDS['Z3-03'].target,12);
+assert.equal(CARDS['Z3-04'].target,12);
+assert.equal(CARDS['Z3-05'].target,12);
+assert.equal(CARDS['Z3-08'].target,11);
+assert.equal(CARDS['Z3-09'].target,13);
+console.log('v0.31 balance regression passed');

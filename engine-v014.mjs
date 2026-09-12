@@ -2,7 +2,7 @@ import {DATA} from './cards-v014.js';
 export {DATA};
 export const CARDS=Object.fromEntries(DATA.cards.map(c=>[c.id,c]));
 export const SAVE_KEY='captainsDashRules015';
-export const FACES=['SKULL',0,1,1,2,2,3,'GOLD'];
+export const FACES=['SKULL',0,0,1,1,2,2,'GOLD'];
 export const LOCATIONS={tavern:'Tavern',market:'Market',dock:'Dock',work:'Harbor Work',quarters:'Crew Quarters',black:'Black Market',veteran:"Veteran’s Den",witch:'Sea Witch'};
 const must=(v,m)=>{if(!v)throw Error(m)};
 export const current=s=>s.players[s.turn];
