@@ -7,6 +7,7 @@
   const menuButtons=[...document.querySelectorAll(".menuBtn")];
   const captainNames=["Captain Anne","Captain Black","Captain Morgan","Captain Silver"];
   const defaultPortraits=["014ea26d527fb00d.jpg","5d6137ac745946c3.jpg","c70de609c89d8c4c.jpg","724be8a80f197bb0.jpg"];
+  const portraitOptions=[...defaultPortraits,"captain-user-01.webp","captain-user-02.webp","captain-user-03.webp","captain-user-04.webp","captain-user-05.webp","captain-user-06.webp"];
   let selectedPortraits=[...defaultPortraits];
   const colors=["#c9302c","#1f76b4","#21924a","#d7aa1d"];
   const seaNames=["Anne","Black","Morgan","Silver","Flint","Rackham","Bonny","Vane","Drake","Kidd","Read","Bellamy"];
@@ -86,18 +87,43 @@
   function renderCaptainPortraits() {
     document.querySelectorAll(".captain").forEach((c,i)=>{
       const img=c.querySelector("img");
-      const portrait=defaultPortraits[i]||defaultPortraits[0];
+      const portrait=selectedPortraits[i]||defaultPortraits[i]||defaultPortraits[0];
       if(img)img.src=`assets/${portrait}`;
       c.dataset.portrait=portrait;
-      c.setAttribute("aria-label",`${captainNames[i]} portrait`);
-      c.removeAttribute("role");
-      c.tabIndex=-1;
+      c.setAttribute("aria-label",`${captainNames[i]} portrait. Tap to change portrait.`);
+      c.setAttribute("role","button");
+      c.tabIndex=i<count?0:-1;
     });
   }
-  function applyPortraits() {
-    selectedPortraits=[...defaultPortraits];
+  function normalizePortraits(values) {
+    const wanted=Array.isArray(values)?values:[];
+    const used=new Set(),out=[];
+    for(let i=0;i<4;i++){
+      const candidate=wanted[i];
+      if(portraitOptions.includes(candidate)&&!used.has(candidate)){out[i]=candidate;used.add(candidate);continue}
+      const fallback=portraitOptions.find(x=>!used.has(x));out[i]=fallback;used.add(fallback);
+    }
+    return out;
+  }
+  function applyPortraits(values) {
+    selectedPortraits=normalizePortraits(values?.length?values:defaultPortraits);
     renderCaptainPortraits();
   }
+  function cyclePortrait(i,dir=1) {
+    if(i>=count)return;
+    const used=new Set(selectedPortraits.filter((_,j)=>j<count&&j!==i));
+    const current=Math.max(0,portraitOptions.indexOf(selectedPortraits[i]));
+    for(let step=1;step<=portraitOptions.length;step++){
+      const idx=(current+dir*step+portraitOptions.length*4)%portraitOptions.length;
+      if(!used.has(portraitOptions[idx])){selectedPortraits[i]=portraitOptions[idx];break}
+    }
+    renderCaptainPortraits();
+    clickSfx(560,.06);
+  }
+  document.querySelectorAll(".captain").forEach((c,i)=>{
+    c.addEventListener("click",()=>cyclePortrait(i,1));
+    c.addEventListener("keydown",e=>{if((e.key==="Enter"||e.key===" ")&&i<count){e.preventDefault();cyclePortrait(i,e.shiftKey?-1:1)}});
+  });
 
   function syncModeNames() {
     const ins=[...document.querySelectorAll("#names input")];
@@ -132,7 +158,7 @@
 
   function currentSetup() {
     return {
-      version:"0.28",
+      version:"0.29",
       players:count,
       names:[...document.querySelectorAll("#names input")].map(x=>x.value.trim()||"Captain"),
       captains:captainNames.slice(0,count),
@@ -157,7 +183,7 @@
   document.getElementById("continueBtn").addEventListener("click",()=>{
     try {
       const full=JSON.parse(localStorage.getItem("captainsDashRules015")||"null");
-      if(full&&full.players?.length){const sv={players:full.players.length,names:full.players.map(p=>p.name),captains:full.players.map(p=>p.captain),portraits:defaultPortraits.slice(0,full.players.length),mode:full.mode||"local",updatedAt:Date.now()};applyPortraits(sv.portraits);setCount(sv.players,sv.names);gameMode=sv.mode;document.getElementById("voyageSummary").textContent=`${sv.players} Captains · Saved Full Game`;document.getElementById("roster").innerHTML=sv.names.map((n,i)=>`<span>${sv.captains[i]} — ${esc(n)}</span>`).join("");document.getElementById("transition").classList.add("show");window.dispatchEvent(new CustomEvent("captainsdash:startgame",{detail:{...sv,resume:true}}));return;}
+      if(full&&full.players?.length){const sv={players:full.players.length,names:full.players.map(p=>p.name),captains:full.players.map(p=>p.captain),portraits:full.players.map((p,i)=>p.portrait||defaultPortraits[i]),mode:full.mode||"local",updatedAt:Date.now()};applyPortraits(sv.portraits);setCount(sv.players,sv.names);gameMode=sv.mode;document.getElementById("voyageSummary").textContent=`${sv.players} Captains · Saved Full Game`;document.getElementById("roster").innerHTML=sv.names.map((n,i)=>`<span>${sv.captains[i]} — ${esc(n)}</span>`).join("");document.getElementById("transition").classList.add("show");window.dispatchEvent(new CustomEvent("captainsdash:startgame",{detail:{...sv,resume:true}}));return;}
       const st=JSON.parse(localStorage.getItem("captainsDashSetup")||"null");if(!st)return;applyPortraits(st.portraits);setCount(Math.max(2,Math.min(4,st.players||2)),st.names);gameMode=st.mode||"local";openPanel("setup");toast("Saved voyage restored.");
     } catch(e){toast("Could not restore the saved game.")}
   });
