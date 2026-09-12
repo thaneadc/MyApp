@@ -1,0 +1,75 @@
+name: Release Captain's Dash v0.32 Final Missions
+
+on:
+  push:
+    branches: ['release/v0.32-final']
+    paths:
+      - 'scripts/release_v032.py'
+      - '.github/workflows/release-v032-final.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  release-v032-final:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout release branch
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Apply v0.32 Final Mission rules
+        run: python3 scripts/release_v032.py
+
+      - name: Set package version
+        run: npm version 0.32.0 --no-git-tag-version
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: JavaScript syntax checks
+        run: |
+          node --check menu.js
+          node --check cards-v014.js
+          node --check voyage-v014.js
+          node --check engine-v014.mjs
+
+      - name: Core rules regression
+        run: npm test
+
+      - name: Preserve AI late-game regression
+        run: node tests/ai-zone3-final-v0301.mjs
+
+      - name: v0.32 Final Mission regression
+        run: node tests/rules-v032.mjs
+
+      - name: Build production bundle
+        run: npm run build
+
+      - name: Verify built v0.32 output
+        shell: bash
+        run: |
+          set -euo pipefail
+          grep -q 'v0.32' dist/index.html
+          grep -q '0.32 Master Rules' dist/cards-v014.js
+          grep -q 'Combat + Sailing' dist/cards-v014.js
+          grep -q 'Search + Combat' dist/cards-v014.js
+          grep -q 'Sailing + Combat' dist/cards-v014.js
+          grep -q '"target": 22' dist/cards-v014.js
+          ! grep -q 'Pay 6 Gold' dist/voyage-v014.js
+          ! grep -q 'Requires 4 Crew, 2 Veterans and 2 Treasures' dist/engine-v014.mjs
+
+      - name: Commit v0.32 implementation
+        shell: bash
+        run: |
+          git config user.name "captains-dash-build-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add cards-v014.js engine-v014.mjs voyage-v014.js menu.js index.html tests/rules-v014.mjs tests/rules-v032.mjs package.json package-lock.json
+          if git diff --cached --quiet; then
+            echo "v0.32 implementation already committed"
+          else
+            git commit -m "Release v0.32 Final Mission rules"
+            git push origin HEAD:release/v0.32-final
+          fi
