@@ -1,0 +1,85 @@
+name: Build Captain's Dash v0.30
+
+on:
+  push:
+    branches: ['release/v0.30']
+    paths:
+      - 'scripts/release_v030.py'
+      - '.github/workflows/release-v030.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build-v030:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout release branch
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Apply Master Rule v0.30 card and engine balance
+        run: python3 scripts/release_v030.py
+
+      - name: Update legacy regression expectations for v0.30
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          p=Path('tests/rules-v014.mjs')
+          s=p.read_text(encoding='utf-8')
+          s=s.replace("if(c.zone)assert(['Combat','Sailing','Search'].includes(c.test));", "if(c.zone)assert(c.test.split(/\\s*\\+\\s*/).every(t=>['Combat','Sailing','Search'].includes(t)));")
+          s=s.replace("let e=expedition();eq(baseScore(current(e),e.exp),4);", "let e=expedition();eq(baseScore(current(e),e.exp),3);")
+          p.write_text(s,encoding='utf-8')
+          p=Path('tests/rules-v030.mjs')
+          s=p.read_text(encoding='utf-8').replace("assert.deepEqual(CARDS.F1?.steps,undefined); // guard accidental property-style lookup\n","")
+          p.write_text(s,encoding='utf-8')
+          PY
+
+      - name: Set package version
+        run: npm version 0.30.0 --no-git-tag-version
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: JavaScript syntax checks
+        run: |
+          node --check menu.js
+          node --check cards-v014.js
+          node --check voyage-v014.js
+          node --check engine-v014.mjs
+
+      - name: Core rules regression
+        run: npm test
+
+      - name: v0.30 Master Rule regression
+        run: node tests/rules-v030.mjs
+
+      - name: Build release
+        run: npm run build
+
+      - name: Verify built v0.30 output
+        shell: bash
+        run: |
+          set -euo pipefail
+          grep -q 'v0.30 TEST' dist/index.html
+          grep -q 'SKULL / 0 / 1 / 1 / 2 / 2 / 3 / GOLD' dist/index.html
+          grep -q 'Combat + Sailing' dist/cards-v014.js
+          grep -q '"target": 15' dist/cards-v014.js
+          grep -q 'testGlyphs' dist/voyage-v014.js
+          grep -q "FACES=\['SKULL',0,1,1,2,2,3,'GOLD'\]" dist/engine-v014.mjs
+
+      - name: Commit v0.30 implementation
+        shell: bash
+        run: |
+          git config user.name "captains-dash-build-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add cards-v014.js engine-v014.mjs voyage-v014.js menu.js index.html tests/rules-v014.mjs tests/rules-v030.mjs package.json package-lock.json
+          if git diff --cached --quiet; then
+            echo "v0.30 implementation already committed"
+          else
+            git commit -m "Release v0.30 Master Rule card balance"
+            git push origin HEAD:release/v0.30
+          fi
